@@ -175,7 +175,7 @@ function setPost(templateCardPost,user_posts,img){
 	current_post.datetime = date;
 	current_post.content = the_post.value ; 
 
-	user_posts.textposts.push(current_post);
+	AddPostToWall(current_post);
 	
 	
 	return templateCardPost.clone();
@@ -348,16 +348,17 @@ function createPost(obj,i,templateCardPost,user_posts)
         });
 		return true;			
 	 }
-	 
-	 function setupPOSN()
-	 {
-		makeApplicationFolders();
-	 }
-	 
 
 	//Makes folders needed to run the POSN application
-	function makeApplicationFolders()
+	function setupPOSN()
 	{
+		//Default values for Wall JSON
+		var user_posts = new Object();
+		user_posts.name = "wholmes";
+		user_posts.picture = "./Personal Profile Template_files/user.jpg";
+		user_posts.textposts = [];
+		parseUser = JSON.stringify(user_posts);
+		
 		subFolderNames = ['Photos','Comments','Music','Videos','Other_Files']
 		mimeType = 'application/vnd.google-apps.folder'
 		bodyMetadata = 
@@ -373,7 +374,7 @@ function createPost(obj,i,templateCardPost,user_posts)
 		{
 			console.log(response.result);
 			makeSubFolders(response.result.id, subFolderNames);
-			updateWallJSON(response.result.id, '');
+			updateWallJSON(response.result.id, parseUser);
 			
         }, function(reason) 
 		{
@@ -622,12 +623,16 @@ function createPost(obj,i,templateCardPost,user_posts)
 				}).then(function(response)
 				{
 				
-									
+					parseString = JSON.parse(response.body);
+					parseString.textposts.push(user_posts);
+					
 					//Step 3: Create new one with new post in it
 					//Response.body has is current Wall JSON content
-					updateJSON = response.body + user_posts;
+					
+					updateJSON = JSON.stringify(parseString);
 					
 					//Step 4: Post updated Wall JSON
+					
 					console.log(updateJSON);
 					
 					//Pass this function the updated Wall JSON with new post appended 
