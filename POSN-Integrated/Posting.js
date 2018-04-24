@@ -1,47 +1,19 @@
 var saveFile = '{"username":"Wholmes","firstname":"Nisha","lastname":"Holmes","birthday":"05/01/1992","email":"abc@gmail.com","phone":"555-555-555"}';
 
 $(document).ready(function(){
+
+/*$(function() {
+	getCurrentWall();
+});*/
+	var savedPosts;
 	
-	
+
 	$('#loginGoogle').click(function(){
 	    handleClientLoad(); 
-	  
+			  
      });
 	
-	var obj;
-	var create;
-	var jsonString;
-	var savedPosts;
-	var counter;
-	var user_posts = new Object();
-	var saveToFile = '{"name":"wholmes","picture":"./Personal Profile Template_files/user.jpg","textposts":[{"datetime":"4/7 19:11","content":"Having fun at Disneyland"},{"datetime":"4/7 19:11","content":" The most important thing in the world is family and love."},{"datetime":"4/7 19:12","content":"Try to be a rainbow in someones cloud."}]}';
-
-	
-	//hard coded in for now
-	user_posts.name = "wholmes";
-	user_posts.picture = "./Personal Profile Template_files/user.jpg";
-	user_posts.textposts = [];
-	
 	$("#card-post").hide(); 
-	$("#post-count").html(0);
-	$("#friend-count").html(0);
-	
-	
-	//loop handles repopulating the posts 
-	for(var i = 0;i < 3;i++)
-	{
-		
-		obj = JSON.parse(saveToFile);
-		create = createPost(obj,i,$("#card-post"),user_posts);
-		create.appendTo(".innerdiv").show();
-		
-	}
-	
-			
-	counter = i;
-	
-	$("#post-count").html(counter);
-
 
 	//disables the post button until post is done 	
 	$(':input[type="submit"]').prop('disabled', true);
@@ -53,39 +25,25 @@ $(document).ready(function(){
 
 	
 	$("#postbtn").click(function(){
-		
-		/*$("input[name=file]").change(function () {
-                if (this.files && this.files[0]) {
-                    var reader = new FileReader();
-
-                    reader.onload = function (e) {
-                        var img = $('<img>').attr('src', e.target.result);
-                        $('.upload-image-preview').html(img);
-                    };
-
-                    reader.readAsDataURL(this.files[0]);
-                }
-            });*/
 
 		
 		$("#post-count").html(counter);
 	
 		$("#card-post").hide().show;
 						 	
-		savedPosts = setPost($("#card-post"),user_posts);
+		savedPosts = setPost($("#card-post"));
 		savedPosts.appendTo(".innerdiv").show();
 		
 		
 	});
 	
-
+	
+	//for now connected to button 
 	$("#download").click(function(){
 			
-		jsonString= JSON.stringify(user_posts);
-		AddPostToWall(jsonString);
-
+		 getCurrentWall();
+			
 	});
-	
 	
 	/*---------------------------------------------------
 					Handles settings 
@@ -131,7 +89,7 @@ $(document).ready(function(){
 		$('#submit').click(function() {
 			
 			
-			update($("#add_listing_info"));
+		update($("#add_listing_info"));
 			
 			
 		
@@ -146,13 +104,19 @@ function handles downloading json file information
 to a txt file. 
 ------------------------------------------------------*/
 
- function download(content, fileName, contentType) {
+ function repopulate(object) {
+	 
+	 
+	//goes through posts 
+	for(var i = 0;i < object.textposts.length;i++)
+	{
+		
+			create = createPost(object,i,$("#card-post"));
+			create.appendTo(".innerdiv").show();
+		
+	}
+
 	
-		var a = document.createElement("a");
-		var file = new Blob([content], {type: contentType});
-		a.href = URL.createObjectURL(file);
-		a.download = fileName;
-		a.click();
 }
 
 
@@ -162,7 +126,7 @@ function handles creating a new post as needed when user
 clicks on post button
 ------------------------------------------------------*/
 
-function setPost(templateCardPost,user_posts,img){
+function setPost(templateCardPost){
 	
 	var current_post = new Object();
 	var the_post = $('#post')[0];
@@ -186,21 +150,18 @@ function setPost(templateCardPost,user_posts,img){
 function handles repopulating previous posts.
 ------------------------------------------------------*/
 
-function createPost(obj,i,templateCardPost,user_posts)
+function createPost(obj,i,templateCardPost)
 {
-	var old_post = new Object();			
-	templateCardPost.find(".name").html(obj.name);
-					
-	//possibly change image src
-	//$("#my_image").attr("src","second.jpg");
-					
+	var old_post = new Object();	
+	
+	templateCardPost.find(".name").html(obj.name);				
 	templateCardPost.find(".display").html(obj.textposts[i].content);
 	templateCardPost.find(".time").html(obj.textposts[i].datetime);
 	
 					
 	old_post.datetime = obj.textposts[i].datetime;
 	old_post.content = obj.textposts[i].content;		
-	user_posts.textposts.push(old_post);
+	
 	
 	return templateCardPost.clone();
 }
@@ -633,8 +594,7 @@ function createPost(obj,i,templateCardPost,user_posts)
 					
 					//Step 4: Post updated Wall JSON
 					
-					console.log(updateJSON);
-					
+									
 					//Pass this function the updated Wall JSON with new post appended 
 					//instead of response.body.
 					
@@ -668,11 +628,15 @@ function createPost(obj,i,templateCardPost,user_posts)
 	
 	function getCurrentWall()
 	{
+		
+		console.log("hi");
 		//Variables for finding JSON file
 		var jsonName = "name= " + "'myWallJSON.txt'";
 		var isTrashed = "trashed = false"
 		var queryList = jsonName + 'and' + isTrashed;
 		var jsonID;
+		var obj;
+		
 		//Find Wall JSON ID
 		gapi.client.drive.files.list(
 		{    
@@ -690,11 +654,10 @@ function createPost(obj,i,templateCardPost,user_posts)
 				alt : 'media'
 			}).then(function(response)
 			{
-				console.log(response.body);
+			
 				//Response.body has is current Wall JSON content
-				//DO WHATEVER NEED TO DO WITH FILE
-				//DO WHATEVER NEED TO DO WITH FILE
-				//DO WHATEVER NEED TO DO WITH FILE
+				obj = JSON.parse(response.body);
+				repopulate(obj);
 
 			}, function(reason)
 			{
@@ -887,54 +850,18 @@ function createPost(obj,i,templateCardPost,user_posts)
 			}
 			console.log(webLinkList)
 	  }
-	
-
-function check(form) {
- if(form.userid.value == "dew" && form.pswrd.value== "123")
-	{
-      window.open('http://www.google.com'); 
-	}
-	else
-	{
-	  alert("The username and password does not match"); 	  
-	}
-}
-
-function CollapseForm()
-{
-	// Two places to customize:
-
-	// Specify the id of the form.
-	var IDofForm = "login";
-
-	// Specify the id of the div containing the form.
-	var IDofDivWithForm = "boxed";
-
-	// This line submits the form. (If Ajax processed, call Ajax function, instead.)
-	document.getElementById(IDofForm).submit();
-
-	// This line collapses the form.
-	document.getElementById(IDofDivWithForm).style.display = "none";
-}
 
 function onSignIn(googleUser){
 // Useful data for your client-side scripts:
-var profile = googleUser.getBasicProfile();
-console.log("ID: " + profile.getId()); // Don't send this directly to your server!
-console.log('Full Name: ' + profile.getName());
-console.log('Given Name: ' + profile.getGivenName());
-console.log('Family Name: ' + profile.getFamilyName());
-console.log("Image URL: " + profile.getImageUrl());
-console.log("Email: " + profile.getEmail());
+	var profile = googleUser.getBasicProfile();
+	//console.log("ID: " + profile.getId()); // Don't send this directly to your server!
+	
 }
 
 function signOut() {
     var auth2 = gapi.auth2.getAuthInstance();
     auth2.signOut().then(function () {
-      console.log('User signed out.');
+ 
     });
   }
-	$('.message a').click(function(){
-	$('.register').animate({height: "toggle", opacity:"toggle"}, "slow"); 
-	}); 
 
