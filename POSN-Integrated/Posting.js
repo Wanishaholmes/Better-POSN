@@ -2,9 +2,6 @@ var saveFile = '{"username":"Wholmes","firstname":"Nisha","lastname":"Holmes","b
 
 $(document).ready(function(){
 
-/*$(function() {
-	getCurrentWall();
-});*/
 	var savedPosts;
 	
 
@@ -669,6 +666,120 @@ function createPost(obj,i,templateCardPost)
 		});
 		
 	}
+
+
+
+function uploadPhotoPost(templateCardPost) 
+	{
+		
+		//General Params for showing post	
+		var current_post = new Object();
+		var the_post = $('#post')[0];
+		var today = new Date();
+		var date = (today.getMonth()+1)+ '/' +today.getDate()+ ' ' + today.getHours() + ":" + today.getMinutes();
+		templateCardPost.find(".display").html(the_post.value);
+		templateCardPost.find(".time").html(date);
+		
+	
+		//Read in file to be uploaded from upload button
+		var uploadFile = document.getElementById("file-input").files[0];
+		var fileContent; 
+		if (uploadFile) 
+		{
+			var name = uploadFile.name;
+			var fileSize = uploadFile.size;
+			var mimeType = uploadFile.type;
+			var reader = new FileReader();
+			reader.readAsBinaryString(uploadFile);
+			reader.onload = function (evt) 
+			{
+				var dirName = "name= " + "'POSN_Photos'";
+				var isTrashed = "trashed = false"
+				var dirQuery = dirName + 'and' + isTrashed;
+				
+				gapi.client.drive.files.list(
+				{
+					'q' : dirQuery
+				}).then(function(response)
+				{
+					console.log(response);
+					PhotoFolderID = response.result.files[0].id;
+				
+					document.getElementById("file-input").innerHTML = evt.target.result;
+						
+					//evt.target.result is actual text/data in file
+					//Encoded in base64
+					fileContent = btoa(evt.target.result);	
+						
+					//Rest of function below handles uploading to Google Drive
+					var auth_token = gapi.client.getToken().access_token;
+					const boundary = '-------314159265358979323846';
+					const delimiter = "\r\n--" + boundary + "\r\n";
+					const close_delim = "\r\n--" + boundary + "--";
+					var metadata = 
+					{ 
+						 "name" : name,
+						 "mimeType": mimeType,
+						 "parents" : [PhotoFolderID]
+					};  
+
+					var multipartRequestBody =
+					delimiter +  'Content-Type: application/json\r\n\r\n' +
+					JSON.stringify(metadata) +
+					delimiter +
+					'Content-Type: application/json' + '\n' +
+					'Content-Transfer-Encoding: base64\r\n\r\n' +
+					fileContent +
+					close_delim;
+					gapi.client.request(
+					{ 
+						'path': '/upload/drive/v3/files/',
+						'method': 'POST',
+						'params': {'uploadType': 'multipart'},
+						'headers': { 'Content-Type': 'multipart/form-data; boundary="' + boundary + '"', 'Authorization': 'Bearer ' + auth_token, },
+						'body': multipartRequestBody 
+					}).execute(function(file) 
+					{ 
+						console.log("Wrote to file " + file.name + " id: " + file.id); 
+						
+						photoID = file.id;
+						gapi.client.drive.files.get(
+						{
+							'fileId': photoID,
+							fields: 'webContentLink'
+						}).then(function(response)
+						{
+							
+						parseResponse = JSON.parse(response.body);
+						webLink = parseResponse.webContentLink;
+						current_post.datetime = date;
+						current_post.content = the_post.value ;
+						current_post.photoLink = webLink;
+						AddPostToWall(current_post);
+						
+						}), function(reason)
+						{
+							console.log(reason);
+						};					
+				
+					}, function(error){
+							console.log(error);
+					});
+				}), function(reason)
+				{
+						console.log(reason);
+				}  
+			}
+			reader.onerror = function (evt) {
+				document.getElementById("myFile").innerHTML = "error reading file";
+			}
+		}
+		return templateCardPost;
+	 }
+	
+
+
+
 	  //gives a list of web links for images in the Photos folder
 	  function getPhotoLinks()
 	  {
