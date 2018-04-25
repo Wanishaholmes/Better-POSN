@@ -24,7 +24,7 @@ $(document).ready(function(){
 	$("#postbtn").click(function(){
 
 		
-		$("#post-count").html(counter);
+
 	
 		$("#card-post").hide().show;
 						 	
@@ -130,7 +130,7 @@ function setPost(templateCardPost){
 	var today = new Date();
 	var date = (today.getMonth()+1)+ '/' +today.getDate()+ ' ' + today.getHours() + ":" + today.getMinutes();	
 	
-	templateCardPost.find(".display").html(the_post.value + img);
+	templateCardPost.find(".display").html(the_post.value );
 	templateCardPost.find(".time").html(date);
 
 	current_post.datetime = date;
@@ -626,7 +626,7 @@ function createPost(obj,i,templateCardPost)
 	function getCurrentWall()
 	{
 		
-		console.log("hi");
+	
 		//Variables for finding JSON file
 		var jsonName = "name= " + "'myWallJSON.txt'";
 		var isTrashed = "trashed = false"
@@ -975,4 +975,6 @@ function signOut() {
  
     });
   }
+
+
 
