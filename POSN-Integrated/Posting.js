@@ -2,11 +2,14 @@ var saveFile = '{"username":"Wholmes","firstname":"Nisha","lastname":"Holmes","b
 
 $(document).ready(function(){
 
+
 	var savedPosts;
 	
 
+			
 	$('#loginGoogle').click(function(){
 	    handleClientLoad(); 
+
 			  
      });
 	
@@ -29,17 +32,17 @@ $(document).ready(function(){
 		$("#card-post").hide().show;
 						 	
 		savedPosts = setPost($("#card-post"));
+
+		//changes id 
+		//savedPosts.attr('id','cardPost');
+		
+		//step 1 : change is of comment div 
+		//step 2 chnage id of button
+		
+
 		savedPosts.appendTo(".innerdiv").show();
 		
 		
-	});
-	
-	
-	//for now connected to button 
-	$("#download").click(function(){
-			
-		 getCurrentWall();
-			
 	});
 	
 	/*---------------------------------------------------
@@ -165,7 +168,6 @@ function createPost(obj,i,templateCardPost)
 
 /*-----------------------------------------
                  Settings functions 
-
 -----------------------------------------*/
  function update()
 {
@@ -223,10 +225,8 @@ function createPost(obj,i,templateCardPost)
 }
 /*------------------------------------------------
 				Google API
-
 --------------------------------------------------*/ 
-
- function handleClientLoad() 
+function handleClientLoad() 
 	  {
         // Loads required libraries for functionality
         gapi.load('client:auth2', initClient);
@@ -263,6 +263,7 @@ function createPost(obj,i,templateCardPost)
 				{
 					//Put here whatever you want to test
 					//AddPostToWall();
+					getCurrentWall();
 				}
 			}
       }
@@ -312,12 +313,25 @@ function createPost(obj,i,templateCardPost)
 	{
 		//Default values for Wall JSON
 		var user_posts = new Object();
+		var wallJsonName = 'myWallJSON.txt';
 		user_posts.name = "wholmes";
 		user_posts.picture = "./Personal Profile Template_files/user.jpg";
 		user_posts.textposts = [];
 		parseUser = JSON.stringify(user_posts);
 		
-		subFolderNames = ['Photos','Comments','Music','Videos','Other_Files']
+		/*
+		//Get Profile information for default settings
+		var userSettings = new Object();
+		var settingsName = 'mySettings.txt';
+		var profile = gapi.auth2.BasicProfile();
+		console.log(profile);
+		userSettings.firstName = profile.getGivenName();
+		userSettings.lastName = profile.getFamilyName();
+		userSettings.userEmail = profile.getEmail();
+		parseSettings = JSON.stringify(userSettings);
+		*/
+		
+		subFolderNames = ['POSN_Photos','POSN_Comments','POSN_Music','POSN_Videos','POSN_Other_Files']
 		mimeType = 'application/vnd.google-apps.folder'
 		bodyMetadata = 
 		{
@@ -332,7 +346,8 @@ function createPost(obj,i,templateCardPost)
 		{
 			console.log(response.result);
 			makeSubFolders(response.result.id, subFolderNames);
-			updateWallJSON(response.result.id, parseUser);
+			postJSON(wallJsonName, response.result.id, parseUser);
+			//postJSON(settingsName, response.result.id, parseSettings);
 			
         }, function(reason) 
 		{
@@ -447,7 +462,7 @@ function createPost(obj,i,templateCardPost)
 			reader.readAsBinaryString(uploadFile);
 			reader.onload = function (evt) 
 			{
-				document.getElementById("myFile").innerHTML = evt.target.result;
+				document.getElementById("file-input").innerHTML = evt.target.result;
 					
 				//evt.target.result is actual text/data in file
 				//Encoded in base64
@@ -492,10 +507,9 @@ function createPost(obj,i,templateCardPost)
 	 }
 	 
 	// Function posts updated Wall JSON to Google Drive
-	function updateWallJSON( directoryID, fileContent )
+	function postJSON( fileName, directoryID, fileContent )
 	{
 		var directory = [directoryID];
-		var name = 'myWallJSON.txt';
 		var mimeType = 'text/plain';
 		var baseFileContent = btoa(fileContent);
 		var auth_token = gapi.client.getToken().access_token;
@@ -504,7 +518,7 @@ function createPost(obj,i,templateCardPost)
 		const close_delim = "\r\n--" + boundary + "--";
 		var metadata = 
 		{ 
-			"name" : name,
+			"name" : fileName,
 			"mimeType": mimeType,
 			"parents" : directory
 		};  
@@ -549,6 +563,7 @@ function createPost(obj,i,templateCardPost)
 		var dirID;
 		
 		//Variables for finding JSON file
+		var fileName = 'myWallJSON.txt';
 		var jsonName = "name= " + "'myWallJSON.txt'";
 		var queryList = jsonName + 'and' + isTrashed;
 		var jsonID;
@@ -591,12 +606,13 @@ function createPost(obj,i,templateCardPost)
 					
 					//Step 4: Post updated Wall JSON
 					
-									
+					console.log(updateJSON);
+					
 					//Pass this function the updated Wall JSON with new post appended 
 					//instead of response.body.
 					
 					//MainDir is id of POSN main directory
-					updateWallJSON(mainDir, updateJSON);
+					postJSON(fileName, mainDir, updateJSON);
 					
 					//Step 5: Delete old Wall JSON	
 					gapi.client.drive.files.delete({
@@ -625,15 +641,12 @@ function createPost(obj,i,templateCardPost)
 	
 	function getCurrentWall()
 	{
-		
-	
 		//Variables for finding JSON file
 		var jsonName = "name= " + "'myWallJSON.txt'";
 		var isTrashed = "trashed = false"
 		var queryList = jsonName + 'and' + isTrashed;
 		var jsonID;
 		var obj;
-		
 		//Find Wall JSON ID
 		gapi.client.drive.files.list(
 		{    
@@ -651,9 +664,8 @@ function createPost(obj,i,templateCardPost)
 				alt : 'media'
 			}).then(function(response)
 			{
-			
-				//Response.body has is current Wall JSON content
-				obj = JSON.parse(response.body);
+				console.log(response.body);
+					obj = JSON.parse(response.body);
 				repopulate(obj);
 
 			}, function(reason)
@@ -666,10 +678,10 @@ function createPost(obj,i,templateCardPost)
 		});
 		
 	}
-
-
-
-function uploadPhotoPost(templateCardPost) 
+	
+	
+	//Can upload a post with Photo to Google Drive
+	function uploadPhotoPost(templateCardPost) 
 	{
 		
 		//General Params for showing post	
@@ -777,9 +789,6 @@ function uploadPhotoPost(templateCardPost)
 		return templateCardPost;
 	 }
 	
-
-
-
 	  //gives a list of web links for images in the Photos folder
 	  function getPhotoLinks()
 	  {
@@ -961,7 +970,9 @@ function uploadPhotoPost(templateCardPost)
 			}
 			console.log(webLinkList)
 	  }
-
+	  
+	
+	
 function onSignIn(googleUser){
 // Useful data for your client-side scripts:
 	var profile = googleUser.getBasicProfile();
@@ -975,6 +986,5 @@ function signOut() {
  
     });
   }
-
 
 
