@@ -273,7 +273,8 @@ function handleClientLoad()
 					//getSharedFile();
 					//removePermissions();
 					//addFriend('TonyMalone','slayer441139@gmail.com');
-					getCurrentWall();
+					//removeFriend('TonyMalone');
+					//getCurrentWall();
 				}
 			}
       }
@@ -427,6 +428,7 @@ function handleClientLoad()
 		
 	function addFriend(name, emailAddress)
 	{
+		console.log('Add friend');
 		//Params for adding permissiom
 		friendRole = "reader";
 		permType = 'user';
@@ -456,7 +458,6 @@ function handleClientLoad()
 				resource : requestBody
 			}).then(function(response)
 			{
-				console.log(response.result)
 				newFriend.permissionID = response.result.id
 				AddPostToWall('myFriendsJSON.txt', newFriend);
 			}, function(reason)
@@ -540,36 +541,30 @@ function handleClientLoad()
 		});
 	}
 
-	function removePermissions()
+	function removePermissions( permissionId )
 	{
 		var fileName = "name= 'myWallJSON.txt'";
 		var isTrashed = "trashed = false"
 		var query = fileName + 'and' + isTrashed;
 
-		//Hard coded until architecture is there
-		var permission = '06870764101196345001'
-		
-		
 		gapi.client.drive.files.list(
 		{    
 			 'q' : query
 		}).then(function(response) 
 		{
 			fileID = response.result.files[0].id
-			console.log(response.result.files);
 			gapi.client.drive.permissions.list(
 			{    
 				 'fileId' : fileID
 			}).then(function(response) 
 			{
-				console.log(response);
 				gapi.client.drive.permissions.delete(
 				{    
 					'fileId' : fileID,
-					'permissionId' : permission
+					'permissionId' : permissionId
 				}).then(function(response) 
 				{
-					console.log(response);
+					
 				}, function(reason) 
 				{
 					console.log('Error: ' + reason.result.error.message);
@@ -583,9 +578,83 @@ function handleClientLoad()
 		{
 			console.log('Error: ' + reason.result.error.message);
 		});
+	}
 	
+	function removeFriend( friendName )
+	{
+		console.log('Remove friend');
+		
+		//Variables for finding POSN_Directory
+		var dirName = "name= " + "'POSN_Directory'";
+		var isTrashed = "trashed = false"
+		var dirQuery = dirName + 'and' + isTrashed;
+		var mainDir;
 	
-
+		//Variables for finding friend JSON
+		var jsonName = "name= " + "'myFriendsJSON.txt'";
+		var queryList = jsonName + 'and' + isTrashed;
+		var jsonID;
+		
+		gapi.client.drive.files.list(
+		{    
+			 'q' : dirQuery
+		}).then(function(response) 
+		{
+			mainDir = response.result.files[0].id;
+			//Find friend JSON ID
+			gapi.client.drive.files.list(
+			{    
+				'q' : queryList
+			}).then(function(response) 
+			{	
+				//ID of friend JSON
+				jsonID = response.result.files[0].id;
+					
+				//Get contents of friend JSON
+				gapi.client.drive.files.get({
+					'fileId' : jsonID,
+					alt : 'media'
+				}).then(function(response)
+				{
+					parseFriends = JSON.parse(response.body);
+					listLength = parseFriends.friendsList.length;
+					for(i = 0; i < listLength; i++)
+					{
+						if(parseFriends.friendsList[i].name == friendName )
+						{
+							console.log('Friend found');
+							removePermissions( parseFriends.friendsList[i].permissionID );
+							parseFriends.friendsList.splice(i);
+							updateJSON = JSON.stringify(parseFriends);
+							postJSON('myFriendsJSON.txt', mainDir, updateJSON);
+							break;
+						}
+						
+					}
+					//Step 5: Delete old friend JSON	
+					gapi.client.drive.files.delete({
+						'fileId' : jsonID
+					}).then(function(response)
+					{
+						
+					}), function(reason)
+					{
+						console.log(reason);
+					}
+					
+				}, function(reason)
+				{
+					console.log('Error: ' + reason.result.error.message);
+				});
+			}, function(reason) 
+			{
+				console.log('Error: ' + reason.result.error.message);
+			});
+		
+        }, function(reason) 
+		{
+			console.log('Error: ' + reason.result.error.message);
+        });	
 	}
 	
 	//Can upload a text file to Google Drive root
@@ -706,7 +775,6 @@ function handleClientLoad()
 		//Variables for finding JSON file
 		var fileName = jsonName;
 		var queryName = `name= '${jsonName}'`;
-		console.log(queryName);
 		var queryList = queryName + 'and' + isTrashed;
 		var jsonID;
 		
@@ -720,18 +788,16 @@ function handleClientLoad()
 			mainDir = response.result.files[0].id;
 			
 			//Step 2: Get JSON file
-			//Find Wall JSON ID
+			//Find JSON ID
 			gapi.client.drive.files.list(
 			{    
 				 'q' : queryList
 			}).then(function(response) 
-			{
-				console.log(response.result);
-				
-				//ID of Wall JSON
+			{				
+				//ID of JSON
 				jsonID = response.result.files[0].id;
 				
-				//Get contents of Wall JSON
+				//Get contents of JSON
 				gapi.client.drive.files.get({
 					'fileId' : jsonID,
 					alt : 'media'
@@ -739,6 +805,8 @@ function handleClientLoad()
 				{
 				
 					parseString = JSON.parse(response.body);
+					
+					//Choose what type of file is being updated
 					if(jsonName == 'myWallJSON.txt')
 					{
 						parseString.textposts.push(user_posts);
@@ -746,30 +814,26 @@ function handleClientLoad()
 					else
 					{
 						parseString.friendsList.push(user_posts);
-						console.log('If didnt work');
 					}
 					
 					//Step 3: Create new one with new post in it
-					//Response.body has is current Wall JSON content
+					//Response.body has is current JSON content
 					
 					updateJSON = JSON.stringify(parseString);
 					
-					//Step 4: Post updated Wall JSON
-					
-					console.log(updateJSON);
-					
-					//Pass this function the updated Wall JSON with new post appended 
+					//Step 4: Post updated JSON
+					//Pass this function the updated JSON with new post appended 
 					//instead of response.body.
 					
 					//MainDir is id of POSN main directory
 					postJSON(fileName, mainDir, updateJSON);
 					
-					//Step 5: Delete old Wall JSON	
+					//Step 5: Delete old JSON	
 					gapi.client.drive.files.delete({
 						'fileId' : jsonID
 					}).then(function(response)
 					{
-						console.log(response);
+						
 					}), function(reason)
 					{
 						console.log(reason);
