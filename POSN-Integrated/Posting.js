@@ -1,5 +1,3 @@
-var saveFile = '{"username":"Wholmes","firstname":"Nisha","lastname":"Holmes","birthday":"05/01/1992","email":"abc@gmail.com","phone":"555-555-555"}';
-
 $(document).ready(function(){
 
 
@@ -32,16 +30,8 @@ $(document).ready(function(){
 		$("#card-post").hide().show;
 						 	
 		savedPosts = setPost($("#card-post"));
-
-		//changes id 
-		//savedPosts.attr('id','cardPost');
-		
-		//step 1 : change is of comment div 
-		//step 2 chnage id of button
-		
-
-		savedPosts.appendTo(".innerdiv").show();
-		
+    	savedPosts.appendTo(".innerdiv").show();
+		$('#post').val('');
 		
 	});
 	
@@ -50,15 +40,13 @@ $(document).ready(function(){
 	
 	-----------------------------------------------------*/
 	
-	obj = JSON.parse(saveFile);
-	var username;
 	
-	$("#add_listing_info").find(".firstname").html(obj.firstname);
-	$("#add_listing_info").find(".lastname").html(obj.lastname);
-	$("#add_listing_info").find(".birthday").html(obj.birthday);
-	$("#add_listing_info").find(".email").html(obj.email);
-	$("#add_listing_info").find(".phone").html(obj.phone);
-	$("#add_listing_info").find(".username").html(obj.username);
+	$("#add_listing_info").find(".firstname").html('');
+	$("#add_listing_info").find(".lastname").html('');
+	$("#add_listing_info").find(".birthday").html('');
+	$("#add_listing_info").find(".email").html('');
+	$("#add_listing_info").find(".phone").html('');
+	$("#add_listing_info").find(".username").html('');
 	
 	$('#fname').hide(); //Initially form will be hidden.
 	$('#lname').hide();
@@ -110,9 +98,11 @@ to a txt file.
 	//goes through posts 
 	for(var i = 0;i < object.textposts.length;i++)
 	{
-		
+			
 			create = createPost(object,i,$("#card-post"));
 			create.appendTo(".innerdiv").show();
+			
+	
 		
 	}
 
@@ -985,5 +975,7 @@ function signOut() {
  
     });
   }
+
+
 
 
