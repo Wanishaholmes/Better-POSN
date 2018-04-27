@@ -138,10 +138,15 @@ function setPost(templateCardPost){
 
 	current_post.datetime = date;
 	current_post.content = the_post.value ; 
-
-	uploadPhotoPost(current_post);
-	//AddPostToWall(current_post);
-	
+	uploadFile = document.getElementById("file-input").files[0];
+	if(uploadFile)
+	{
+		uploadPhotoPost(current_post);
+	}
+	else
+	{
+		AddPostToWall(current_post);
+	}	
 	
 	return templateCardPost.clone();
 }
@@ -307,8 +312,8 @@ function handleClientLoad()
 			console.log('Error: ' + reason.result.error.message);
         });
 		return true;			
-	 }
-
+	}
+	
 	//Makes folders needed to run the POSN application
 	function setupPOSN()
 	{
@@ -776,7 +781,9 @@ function handleClientLoad()
 				document.getElementById("myFile").innerHTML = "error reading file";
 			}
 		}
-		$("#file").replaceWith($("#file").val('').clone(true));
+		var $el = $('#file-input');
+		$el.wrap('<form>').closest('form').get(0).reset();
+		$el.unwrap();
 		uploadFileAfter = document.getElementById("file-input").files[0];
 		console.log(uploadFileAfter);
 	 }
