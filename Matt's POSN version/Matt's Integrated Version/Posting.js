@@ -145,7 +145,7 @@ function setPost(templateCardPost){
 	}
 	else
 	{
-		AddPostToWall(current_post);
+		AddPostToWall('myWallJSON.txt', current_post);
 	}	
 	
 	return templateCardPost.clone();
@@ -269,7 +269,10 @@ function handleClientLoad()
 				{
 					//Put here whatever you want to test
 					//AddPostToWall();
-					permissionTest();
+					//addFriend('slayer441139@gmail.com');
+					//getSharedFile();
+					//removePermissions();
+					//addFriend('TonyMalone','slayer441139@gmail.com');
 					getCurrentWall();
 				}
 			}
@@ -300,7 +303,6 @@ function handleClientLoad()
 			 'q' : query
 		}).then(function(response) 
 		{
-			console.log(response.result);
 			if( response.result.files.length == 0 )
 			{
 				//If folder is not found (POSN not initialized),
@@ -325,6 +327,12 @@ function handleClientLoad()
 		user_posts.picture = "./Personal Profile Template_files/user.jpg";
 		user_posts.textposts = [];
 		parseUser = JSON.stringify(user_posts);
+		
+		//Default values for friend JSON
+		var friend = new Object();
+		var friendFileName = 'myFriendsJSON.txt'
+		friend.friendsList = [];
+		parseFriends = JSON.stringify(friend);
 		
 		/*
 		//Get Profile information for default settings
@@ -354,6 +362,7 @@ function handleClientLoad()
 			console.log(response.result);
 			makeSubFolders(response.result.id, subFolderNames);
 			postJSON(wallJsonName, response.result.id, parseUser);
+			postJSON(friendFileName, response.result.id, parseFriends);
 			//postJSON(settingsName, response.result.id, parseSettings);
 			
         }, function(reason) 
@@ -416,9 +425,21 @@ function handleClientLoad()
 		})
 	}
 		
-	function permissionTest()
+	function addFriend(name, emailAddress)
 	{
-		//Pass like "'Name'" to function
+		//Params for adding permissiom
+		friendRole = "reader";
+		permType = 'user';
+		requestBody = {
+			"type": permType,
+			"emailAddress": emailAddress,
+			"role": friendRole,
+		}
+		newFriend = new Object();
+		newFriend.name = name;
+		newFriend.email = emailAddress;
+		
+		//Params for other API calls 
 		var fileName = "name= 'myWallJSON.txt'";
 		var isTrashed = "trashed = false"
 		var query = fileName + 'and' + isTrashed;
@@ -429,8 +450,52 @@ function handleClientLoad()
 		}).then(function(response) 
 		{
 			fileID = response.result.files[0].id;
-			addPermissions(fileID, 'slayer441139@gmail.com');
+			gapi.client.drive.permissions.create(
+			{
+				'fileId' : fileID,
+				resource : requestBody
+			}).then(function(response)
+			{
+				console.log(response.result)
+				newFriend.permissionID = response.result.id
+				AddPostToWall('myFriendsJSON.txt', newFriend);
+			}, function(reason)
+			{
+				console.log('Error: ' + reason.result.error.message);
+			});
+		}, function(reason) 
+		{
+			console.log('Error: ' + reason.result.error.message);
+		});
+	}
+	
+	function getSharedFile()
+	{
+		var fileName = "name= 'myWallJSON.txt'";
+		var isTrashed = "trashed = false"
+		var sharedParam = "sharedWithMe = true";
+		var query = fileName + 'and' + isTrashed + 'and' + sharedParam;
+		console.log(query);
+		gapi.client.drive.files.list(
+		{    
+			 'q' : query
+		}).then(function(response) 
+		{
+			fileID = response.result.files[0].id
 			console.log(fileID);
+			gapi.client.drive.files.get(
+			{    
+				'fileId' : fileID,
+				alt : 'media'
+			}).then(function(response) 
+			{
+				console.log(response.body);
+				
+			}, function(reason) 
+			{
+				console.log('Error: ' + reason.result.error.message);
+			});
+			
 		}, function(reason) 
 		{
 			console.log('Error: ' + reason.result.error.message);
@@ -473,7 +538,55 @@ function handleClientLoad()
 		{
 			console.log('Error: ' + reason.result.error.message);
 		});
-	}    
+	}
+
+	function removePermissions()
+	{
+		var fileName = "name= 'myWallJSON.txt'";
+		var isTrashed = "trashed = false"
+		var query = fileName + 'and' + isTrashed;
+
+		//Hard coded until architecture is there
+		var permission = '06870764101196345001'
+		
+		
+		gapi.client.drive.files.list(
+		{    
+			 'q' : query
+		}).then(function(response) 
+		{
+			fileID = response.result.files[0].id
+			console.log(response.result.files);
+			gapi.client.drive.permissions.list(
+			{    
+				 'fileId' : fileID
+			}).then(function(response) 
+			{
+				console.log(response);
+				gapi.client.drive.permissions.delete(
+				{    
+					'fileId' : fileID,
+					'permissionId' : permission
+				}).then(function(response) 
+				{
+					console.log(response);
+				}, function(reason) 
+				{
+					console.log('Error: ' + reason.result.error.message);
+				});			
+			}, function(reason) 
+			{
+				console.log('Error: ' + reason.result.error.message);
+			});
+			
+		}, function(reason) 
+		{
+			console.log('Error: ' + reason.result.error.message);
+		});
+	
+	
+
+	}
 	
 	//Can upload a text file to Google Drive root
 	function uploadFileFromButton() 
@@ -582,7 +695,7 @@ function handleClientLoad()
 	//4. Post updated Wall JSON
 	//5. Delete old Wall JSON
 
-	function AddPostToWall(user_posts)
+	function AddPostToWall(jsonName, user_posts)
 	{
 		//Variables for finding POSN_Directory
 		var dirName = "name= " + "'POSN_Directory'";
@@ -591,9 +704,10 @@ function handleClientLoad()
 		var dirID;
 		
 		//Variables for finding JSON file
-		var fileName = 'myWallJSON.txt';
-		var jsonName = "name= " + "'myWallJSON.txt'";
-		var queryList = jsonName + 'and' + isTrashed;
+		var fileName = jsonName;
+		var queryName = `name= '${jsonName}'`;
+		console.log(queryName);
+		var queryList = queryName + 'and' + isTrashed;
 		var jsonID;
 		
 		//Step 1: Find POSN_Directory ID
@@ -625,7 +739,15 @@ function handleClientLoad()
 				{
 				
 					parseString = JSON.parse(response.body);
-					parseString.textposts.push(user_posts);
+					if(jsonName == 'myWallJSON.txt')
+					{
+						parseString.textposts.push(user_posts);
+					}
+					else
+					{
+						parseString.friendsList.push(user_posts);
+						console.log('If didnt work');
+					}
 					
 					//Step 3: Create new one with new post in it
 					//Response.body has is current Wall JSON content
@@ -681,7 +803,6 @@ function handleClientLoad()
 			'q' : queryList
 		}).then(function(response) 
 		{
-			console.log(response.result);
 				
 			//ID of Wall JSON
 			jsonID = response.result.files[0].id;
@@ -692,8 +813,7 @@ function handleClientLoad()
 				alt : 'media'
 			}).then(function(response)
 			{
-				console.log(response.body);
-					obj = JSON.parse(response.body);
+				obj = JSON.parse(response.body);
 				repopulate(obj);
 
 			}, function(reason)
@@ -784,7 +904,7 @@ function handleClientLoad()
 						parseResponse = JSON.parse(response.body);
 						webLink = parseResponse.webContentLink;
 						current_post.photoLink = webLink;
-						AddPostToWall(current_post);
+						AddPostToWall('myWallJSON.txt', current_post);
 						
 						}), function(reason)
 						{
@@ -807,7 +927,6 @@ function handleClientLoad()
 		$el.wrap('<form>').closest('form').get(0).reset();
 		$el.unwrap();
 		uploadFileAfter = document.getElementById("file-input").files[0];
-		console.log(uploadFileAfter);
 	 }
 	
 	  //gives a list of web links for images in the Photos folder
