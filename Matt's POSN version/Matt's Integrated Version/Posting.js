@@ -175,7 +175,8 @@ function setPost(templateCardPost,user_posts,img){
 	current_post.datetime = date;
 	current_post.content = the_post.value ;
 
-	AddPostToWall(current_post);
+	uploadPhotoPost(current_post);
+	//AddPostToWall(current_post);
 	
 	
 	return templateCardPost.clone();
@@ -723,18 +724,9 @@ function createPost(obj,i,templateCardPost,user_posts)
 	
 	
 	//Can upload a post with Photo to Google Drive
-	function uploadPhotoPost(templateCardPost) 
+	function uploadPhotoPost(current_post) 
 	{
 		
-		//General Params for showing post	
-		var current_post = new Object();
-		var the_post = $('#post')[0];
-		var today = new Date();
-		var date = (today.getMonth()+1)+ '/' +today.getDate()+ ' ' + today.getHours() + ":" + today.getMinutes();
-		templateCardPost.find(".display").html(the_post.value);
-		templateCardPost.find(".time").html(date);
-		
-	
 		//Read in file to be uploaded from upload button
 		var uploadFile = document.getElementById("file-input").files[0];
 		var fileContent; 
@@ -806,8 +798,6 @@ function createPost(obj,i,templateCardPost,user_posts)
 							
 						parseResponse = JSON.parse(response.body);
 						webLink = parseResponse.webContentLink;
-						current_post.datetime = date;
-						current_post.content = the_post.value ;
 						current_post.photoLink = webLink;
 						AddPostToWall(current_post);
 						

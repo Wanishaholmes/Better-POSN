@@ -139,7 +139,8 @@ function setPost(templateCardPost){
 	current_post.datetime = date;
 	current_post.content = the_post.value ; 
 
-	AddPostToWall(current_post);
+	uploadPhotoPost(current_post);
+	//AddPostToWall(current_post);
 	
 	
 	return templateCardPost.clone();
@@ -681,20 +682,11 @@ function handleClientLoad()
 	
 	
 	//Can upload a post with Photo to Google Drive
-	function uploadPhotoPost(templateCardPost) 
+	function uploadPhotoPost(current_post) 
 	{
-		
-		//General Params for showing post	
-		var current_post = new Object();
-		var the_post = $('#post')[0];
-		var today = new Date();
-		var date = (today.getMonth()+1)+ '/' +today.getDate()+ ' ' + today.getHours() + ":" + today.getMinutes();
-		templateCardPost.find(".display").html(the_post.value);
-		templateCardPost.find(".time").html(date);
-		
-	
 		//Read in file to be uploaded from upload button
 		var uploadFile = document.getElementById("file-input").files[0];
+		console.log(uploadFile);
 		var fileContent; 
 		if (uploadFile) 
 		{
@@ -764,8 +756,6 @@ function handleClientLoad()
 							
 						parseResponse = JSON.parse(response.body);
 						webLink = parseResponse.webContentLink;
-						current_post.datetime = date;
-						current_post.content = the_post.value ;
 						current_post.photoLink = webLink;
 						AddPostToWall(current_post);
 						
@@ -786,7 +776,9 @@ function handleClientLoad()
 				document.getElementById("myFile").innerHTML = "error reading file";
 			}
 		}
-		return templateCardPost;
+		$("#file").replaceWith($("#file").val('').clone(true));
+		uploadFileAfter = document.getElementById("file-input").files[0];
+		console.log(uploadFileAfter);
 	 }
 	
 	  //gives a list of web links for images in the Photos folder
