@@ -1,47 +1,19 @@
 var saveFile = '{"username":"Wholmes","firstname":"Nisha","lastname":"Holmes","birthday":"05/01/1992","email":"abc@gmail.com","phone":"555-555-555"}';
 
 $(document).ready(function(){
+
+
+	var savedPosts;
 	
-	
+
+			
 	$('#loginGoogle').click(function(){
 	    handleClientLoad(); 
-	  
+
+			  
      });
 	
-	var obj;
-	var create;
-	var jsonString;
-	var savedPosts;
-	var counter;
-	var user_posts = new Object();
-	var saveToFile = '{"name":"wholmes","picture":"./Personal Profile Template_files/user.jpg","textposts":[{"datetime":"4/7 19:11","content":"Having fun at Disneyland"},{"datetime":"4/7 19:11","content":" The most important thing in the world is family and love."},{"datetime":"4/7 19:12","content":"Try to be a rainbow in someones cloud."}]}';
-
-	
-	//hard coded in for now
-	user_posts.name = "wholmes";
-	user_posts.picture = "./Personal Profile Template_files/user.jpg";
-	user_posts.textposts = [];
-	
 	$("#card-post").hide(); 
-	$("#post-count").html(0);
-	$("#friend-count").html(0);
-	
-	
-	//loop handles repopulating the posts 
-	for(var i = 0;i < 3;i++)
-	{
-		
-		obj = JSON.parse(saveToFile);
-		create = createPost(obj,i,$("#card-post"),user_posts);
-		create.appendTo(".innerdiv").show();
-		
-	}
-	
-			
-	counter = i;
-	
-	$("#post-count").html(counter);
-
 
 	//disables the post button until post is done 	
 	$(':input[type="submit"]').prop('disabled', true);
@@ -53,39 +25,25 @@ $(document).ready(function(){
 
 	
 	$("#postbtn").click(function(){
-		
-		/*$("input[name=file]").change(function () {
-                if (this.files && this.files[0]) {
-                    var reader = new FileReader();
-
-                    reader.onload = function (e) {
-                        var img = $('<img>').attr('src', e.target.result);
-                        $('.upload-image-preview').html(img);
-                    };
-
-                    reader.readAsDataURL(this.files[0]);
-                }
-            });*/
 
 		
-		$("#post-count").html(counter);
+
 	
 		$("#card-post").hide().show;
+						 	
+		savedPosts = setPost($("#card-post"));
+
+		//changes id 
+		//savedPosts.attr('id','cardPost');
 		
-		savedPosts = uploadPhotoPost($("#card-post"));
+		//step 1 : change is of comment div 
+		//step 2 chnage id of button
+		
+
 		savedPosts.appendTo(".innerdiv").show();
 		
 		
 	});
-	
-
-	$("#download").click(function(){
-			
-		jsonString= JSON.stringify(user_posts);
-		AddPostToWall(jsonString);
-
-	});
-	
 	
 	/*---------------------------------------------------
 					Handles settings 
@@ -131,7 +89,7 @@ $(document).ready(function(){
 		$('#submit').click(function() {
 			
 			
-			update($("#add_listing_info"));
+		update($("#add_listing_info"));
 			
 			
 		
@@ -146,13 +104,19 @@ function handles downloading json file information
 to a txt file. 
 ------------------------------------------------------*/
 
- function download(content, fileName, contentType) {
+ function repopulate(object) {
+	 
+	 
+	//goes through posts 
+	for(var i = 0;i < object.textposts.length;i++)
+	{
+		
+			create = createPost(object,i,$("#card-post"));
+			create.appendTo(".innerdiv").show();
+		
+	}
+
 	
-		var a = document.createElement("a");
-		var file = new Blob([content], {type: contentType});
-		a.href = URL.createObjectURL(file);
-		a.download = fileName;
-		a.click();
 }
 
 
@@ -162,22 +126,27 @@ function handles creating a new post as needed when user
 clicks on post button
 ------------------------------------------------------*/
 
-function setPost(templateCardPost,user_posts,img){
+function setPost(templateCardPost){
 	
 	var current_post = new Object();
 	var the_post = $('#post')[0];
 	var today = new Date();
 	var date = (today.getMonth()+1)+ '/' +today.getDate()+ ' ' + today.getHours() + ":" + today.getMinutes();	
 	
-	templateCardPost.find(".display").html(the_post.value + img);
+	templateCardPost.find(".display").html(the_post.value );
 	templateCardPost.find(".time").html(date);
 
 	current_post.datetime = date;
-	current_post.content = the_post.value ;
-
-	uploadPhotoPost(current_post);
-	//AddPostToWall(current_post);
-	
+	current_post.content = the_post.value ; 
+	uploadFile = document.getElementById("file-input").files[0];
+	if(uploadFile)
+	{
+		uploadPhotoPost(current_post);
+	}
+	else
+	{
+		AddPostToWall(current_post);
+	}	
 	
 	return templateCardPost.clone();
 }
@@ -187,28 +156,24 @@ function setPost(templateCardPost,user_posts,img){
 function handles repopulating previous posts.
 ------------------------------------------------------*/
 
-function createPost(obj,i,templateCardPost,user_posts)
+function createPost(obj,i,templateCardPost)
 {
-	var old_post = new Object();			
-	templateCardPost.find(".name").html(obj.name);
-					
-	//possibly change image src
-	//$("#my_image").attr("src","second.jpg");
-					
+	var old_post = new Object();	
+	
+	templateCardPost.find(".name").html(obj.name);				
 	templateCardPost.find(".display").html(obj.textposts[i].content);
 	templateCardPost.find(".time").html(obj.textposts[i].datetime);
 	
 					
 	old_post.datetime = obj.textposts[i].datetime;
 	old_post.content = obj.textposts[i].content;		
-	user_posts.textposts.push(old_post);
+	
 	
 	return templateCardPost.clone();
 }
 
 /*-----------------------------------------
                  Settings functions 
-
 -----------------------------------------*/
  function update()
 {
@@ -266,10 +231,8 @@ function createPost(obj,i,templateCardPost,user_posts)
 }
 /*------------------------------------------------
 				Google API
-
 --------------------------------------------------*/ 
-
- function handleClientLoad() 
+function handleClientLoad() 
 	  {
         // Loads required libraries for functionality
         gapi.load('client:auth2', initClient);
@@ -306,6 +269,8 @@ function createPost(obj,i,templateCardPost,user_posts)
 				{
 					//Put here whatever you want to test
 					//AddPostToWall();
+					permissionTest();
+					getCurrentWall();
 				}
 			}
       }
@@ -348,8 +313,8 @@ function createPost(obj,i,templateCardPost,user_posts)
 			console.log('Error: ' + reason.result.error.message);
         });
 		return true;			
-	 }
-
+	}
+	
 	//Makes folders needed to run the POSN application
 	function setupPOSN()
 	{
@@ -451,6 +416,27 @@ function createPost(obj,i,templateCardPost,user_posts)
 		})
 	}
 		
+	function permissionTest()
+	{
+		//Pass like "'Name'" to function
+		var fileName = "name= 'myWallJSON.txt'";
+		var isTrashed = "trashed = false"
+		var query = fileName + 'and' + isTrashed;
+		var fileID;
+		gapi.client.drive.files.list(
+		{    
+			 'q' : query
+		}).then(function(response) 
+		{
+			fileID = response.result.files[0].id;
+			addPermissions(fileID, 'slayer441139@gmail.com');
+			console.log(fileID);
+		}, function(reason) 
+		{
+			console.log('Error: ' + reason.result.error.message);
+		});
+	}
+	
 	//Shows information about a file's permissions
 	function showPermissions( fileID )
 	{
@@ -688,6 +674,7 @@ function createPost(obj,i,templateCardPost,user_posts)
 		var isTrashed = "trashed = false"
 		var queryList = jsonName + 'and' + isTrashed;
 		var jsonID;
+		var obj;
 		//Find Wall JSON ID
 		gapi.client.drive.files.list(
 		{    
@@ -706,10 +693,8 @@ function createPost(obj,i,templateCardPost,user_posts)
 			}).then(function(response)
 			{
 				console.log(response.body);
-				//Response.body has is current Wall JSON content
-				//DO WHATEVER NEED TO DO WITH FILE
-				//DO WHATEVER NEED TO DO WITH FILE
-				//DO WHATEVER NEED TO DO WITH FILE
+					obj = JSON.parse(response.body);
+				repopulate(obj);
 
 			}, function(reason)
 			{
@@ -726,9 +711,9 @@ function createPost(obj,i,templateCardPost,user_posts)
 	//Can upload a post with Photo to Google Drive
 	function uploadPhotoPost(current_post) 
 	{
-		
 		//Read in file to be uploaded from upload button
 		var uploadFile = document.getElementById("file-input").files[0];
+		console.log(uploadFile);
 		var fileContent; 
 		if (uploadFile) 
 		{
@@ -818,7 +803,11 @@ function createPost(obj,i,templateCardPost,user_posts)
 				document.getElementById("myFile").innerHTML = "error reading file";
 			}
 		}
-		return templateCardPost;
+		var $el = $('#file-input');
+		$el.wrap('<form>').closest('form').get(0).reset();
+		$el.unwrap();
+		uploadFileAfter = document.getElementById("file-input").files[0];
+		console.log(uploadFileAfter);
 	 }
 	
 	  //gives a list of web links for images in the Photos folder
@@ -1002,54 +991,21 @@ function createPost(obj,i,templateCardPost,user_posts)
 			}
 			console.log(webLinkList)
 	  }
+	  
 	
-
-function check(form) {
- if(form.userid.value == "dew" && form.pswrd.value== "123")
-	{
-      window.open('http://www.google.com'); 
-	}
-	else
-	{
-	  alert("The username and password does not match"); 	  
-	}
-}
-
-function CollapseForm()
-{
-	// Two places to customize:
-
-	// Specify the id of the form.
-	var IDofForm = "login";
-
-	// Specify the id of the div containing the form.
-	var IDofDivWithForm = "boxed";
-
-	// This line submits the form. (If Ajax processed, call Ajax function, instead.)
-	document.getElementById(IDofForm).submit();
-
-	// This line collapses the form.
-	document.getElementById(IDofDivWithForm).style.display = "none";
-}
-
+	
 function onSignIn(googleUser){
 // Useful data for your client-side scripts:
-var profile = googleUser.getBasicProfile();
-console.log("ID: " + profile.getId()); // Don't send this directly to your server!
-console.log('Full Name: ' + profile.getName());
-console.log('Given Name: ' + profile.getGivenName());
-console.log('Family Name: ' + profile.getFamilyName());
-console.log("Image URL: " + profile.getImageUrl());
-console.log("Email: " + profile.getEmail());
+	var profile = googleUser.getBasicProfile();
+	//console.log("ID: " + profile.getId()); // Don't send this directly to your server!
+	
 }
 
 function signOut() {
     var auth2 = gapi.auth2.getAuthInstance();
     auth2.signOut().then(function () {
-      console.log('User signed out.');
+ 
     });
   }
-	$('.message a').click(function(){
-	$('.register').animate({height: "toggle", opacity:"toggle"}, "slow"); 
-	}); 
+
 
