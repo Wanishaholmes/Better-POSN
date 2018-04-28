@@ -88,6 +88,8 @@
 			  
 			
 				<i><center>Short Profile Info.</center></i>
+				      
+  
 			</p>
 			
 			
@@ -122,11 +124,17 @@
 											<i class="fa fa-upload" style="font-size:25px;color:#ad2ab2"></i>
 										</label>
 										
-										<input id="file-input" type="file" name = "file" value = "Upload Image"/>
+										<input id="file-input" type="file" name = "file" value = "Upload Image" />
 										 <!-- <div class="upload-image-preview"></div>-->
+										 
+										   
+   
+											
+											
+										      
 									</div>
 										
-				
+														
 									<button id = 'postbtn' type="submit" class = "button1">Post</button>	
 								</div>
 							</form>
@@ -151,19 +159,20 @@
 								</div>
 								<div class="row">
 									<div class="col-sm-8 col-sm-offset-2 data-post">
-										<p><span class= "display" ></span>
-										<span class = "image" ></span></p>
+										<p><span class= "display" ></span></p>
+										<p><div class="upload-image-preview" ></div></p>
+										
 											   
 										<div class="reaction">
-											<img draggable="false" class="emoji" id = "emoji" alt="❤" src="./Personal Profile Template_files/2764.png" onclick="love()"> <span id = "love1" class= "love1"></span> </img>
-											<!--<img draggable="false" class="emoji" alt="😃" src="./Personal Profile Template_files/1f603.png"> </img>-->		 
+										
+  											
 										</div>
 										<div class="comments">
 											<!--<div class="more-comments">View more comments</div>-->
 												<div id = "commentdiv" class = "commentdiv" > 
-													<div class="comment-post" id = 'comment-post'>
-														<p><span id = "Comment" class= "Comment" ></span></p>
-													</div>
+												
+														<p><span id = "Comment" class= "Comment" > </span></p>
+													
 												</div>
 											
 											<form id = "form" class = "form-inline" onsubmit="return false">
@@ -248,11 +257,15 @@
 		<script type="text/javascript" src="jquery-3.3.1.min.js"></script> <!-- This is like the iostream of javascript if I had to equate it -->
 		<script type="text/javascript" src="jquery-ui.js"></script> <!-- Helps with animations -->
 		<script type="text/javascript" src="jquery.form.js"></script> <!-- Helps with animations -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+		<script src="jquery.cookie.js"></script>
 		<script async defer src="https://apis.google.com/js/api.js"
 		onload="this.onload=handleClientLoad()"
 		onreadystatechange="if (this.readyState === 'complete') this.onload()">
+		
 		</script>
 	
 	
 	</body>
 </html>
+
