@@ -1,18 +1,41 @@
 $(document).ready(function(){
-
-
 	var savedPosts;
-	
+	var img;
 
-			
+	/*---------------------------------
+					Startup
+	-----------------------------------*/
 	$('#loginGoogle').click(function(){
-	    handleClientLoad(); 
-
-			  
+	    handleClientLoad(); 	  
      });
-	
-	$("#card-post").hide(); 
 
+	$("#card-post").hide(); 
+	
+	settingedit();
+	buttondisable();
+
+	$("#postbtn").click(function(){
+		
+		$("#card-post").hide().show;
+	
+		if ($("#file-input")[0].files &&$("#file-input")[0].files[0]) {
+			var reader = new FileReader();
+			reader.onload = function (e) {
+				img = $('<img>').attr('src', e.target.result);
+			};
+			reader.readAsDataURL($("#file-input")[0].files[0]);
+		}
+			
+		savedPosts = setPost($("#card-post"),img);
+	    savedPosts.appendTo(".innerdiv").show();
+
+		$('#post').val('');
+	});
+	
+});
+
+function buttondisable(){
+	
 	//disables the post button until post is done 	
 	$(':input[type="submit"]').prop('disabled', true);
      $('input[type="text"]').keyup(function() {
@@ -20,26 +43,10 @@ $(document).ready(function(){
            $(':input[type="submit"]').prop('disabled', false);
         }
     });
-
 	
-	$("#postbtn").click(function(){
-
-		
-
-	
-		$("#card-post").hide().show;
-						 	
-		savedPosts = setPost($("#card-post"));
-    	savedPosts.appendTo(".innerdiv").show();
-		$('#post').val('');
-		
-	});
-	
-	/*---------------------------------------------------
-					Handles settings 
-	
-	-----------------------------------------------------*/
-	
+}
+function settingedit()
+{
 	
 	$("#add_listing_info").find(".firstname").html('');
 	$("#add_listing_info").find(".lastname").html('');
@@ -78,14 +85,10 @@ $(document).ready(function(){
 			
 			
 		update($("#add_listing_info"));
-			
-			
-		
-		});
-	
-	
 
-});
+		});
+
+}
 /*-----------------------------------------------------
 				download
 function handles downloading json file information 
@@ -116,26 +119,37 @@ function handles creating a new post as needed when user
 clicks on post button
 ------------------------------------------------------*/
 
-function setPost(templateCardPost){
+function setPost(templateCardPost,img){
 	
 	var current_post = new Object();
 	var the_post = $('#post')[0];
 	var today = new Date();
 	var date = (today.getMonth()+1)+ '/' +today.getDate()+ ' ' + today.getHours() + ":" + today.getMinutes();	
 	
+	
+	
 	templateCardPost.find(".display").html(the_post.value );
 	templateCardPost.find(".time").html(date);
 
+
 	current_post.datetime = date;
 	current_post.content = the_post.value ; 
+	
+	
 	uploadFile = document.getElementById("file-input").files[0];
+	console.log(uploadFile);
+	
+	
 	if(uploadFile)
 	{
+	
 		uploadPhotoPost(current_post);
+		templateCardPost.find(".upload-image-preview").html(img);  
 	}
 	else
 	{
 		AddPostToWall(current_post);
+		templateCardPost.find(".upload-image-preview").html('');  
 	}	
 	
 	return templateCardPost.clone();
@@ -150,13 +164,17 @@ function createPost(obj,i,templateCardPost)
 {
 	var old_post = new Object();	
 	
+	img = $('<img>').attr('src', obj.textposts[i].photoLink);
+	
 	templateCardPost.find(".name").html(obj.name);				
 	templateCardPost.find(".display").html(obj.textposts[i].content);
 	templateCardPost.find(".time").html(obj.textposts[i].datetime);
+	templateCardPost.find(".upload-image-preview").html(img);  
 	
 					
 	old_post.datetime = obj.textposts[i].datetime;
-	old_post.content = obj.textposts[i].content;		
+	old_post.content = obj.textposts[i].content;	
+	old_post.photoLink = obj.textposts[i].photoLink;
 	
 	
 	return templateCardPost.clone();
@@ -975,6 +993,7 @@ function signOut() {
  
     });
   }
+
 
 
 
