@@ -25,7 +25,7 @@
 
 		<ul>
 			<li><a href = "http://personalonlinesocialnetwork.com "class="active" href="#posn" target="_blank">About POSN</a></li>
-			<li><a href = "./login" class="active" href="#home">Home</a></li>
+			<li><a href = "./login.html" class="active" href="#home">Home</a></li>
 			<li><a href="#" onclick="signOut();">Sign out</a></li>
 
 		</ul>
@@ -43,8 +43,9 @@
 			<div class= "boxed">
 		
 				<center><div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark" ></div>
-		
-				<a href="./Posting.html"><input type="button" value="Enter POSN" /></a></center>
+				<script type = "text/javascript" src="Posting.js"></script>
+
+				<a href="./Posting.html"><script language = "javascript">isPOSNSetup(); </script><input type="button" value="Enter POSN" /></a></center>
 			</div>
 		</div>	
 
@@ -56,11 +57,9 @@
 		<script type="text/javascript" src="jquery-3.3.1.min.js"></script> <!-- This is like the iostream of javascript if I had to equate it -->
 		<script type="text/javascript" src="jquery-ui.js"></script> <!-- Helps with animations -->
 		<script type="text/javascript" src="jquery.form.js"></script> <!-- Helps with animations -->
-		<script src="Posting.js"></script>
 		<script src="https://apis.google.com/js/platform.js" async defer></script>
 
 	</body> 
 			
 </html>
-
 
