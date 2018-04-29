@@ -1,20 +1,41 @@
-var saveFile = '{"username":"Wholmes","firstname":"Nisha","lastname":"Holmes","birthday":"05/01/1992","email":"abc@gmail.com","phone":"555-555-555"}';
-
 $(document).ready(function(){
-
-
 	var savedPosts;
-	
+	var img;
 
-			
+	/*---------------------------------
+					Startup
+	-----------------------------------*/
 	$('#loginGoogle').click(function(){
-	    handleClientLoad(); 
-
-			  
+	    handleClientLoad(); 	  
      });
-	
-	$("#card-post").hide(); 
 
+	$("#card-post").hide(); 
+	
+	settingedit();
+	buttondisable();
+
+	$("#postbtn").click(function(){
+		
+		$("#card-post").hide().show;
+	
+		if ($("#file-input")[0].files &&$("#file-input")[0].files[0]) {
+			var reader = new FileReader();
+			reader.onload = function (e) {
+				img = $('<img>').attr('src', e.target.result);
+			};
+			reader.readAsDataURL($("#file-input")[0].files[0]);
+		}
+			
+		savedPosts = setPost($("#card-post"),img);
+	    savedPosts.appendTo(".innerdiv").show();
+
+		$('#post').val('');
+	});
+	
+});
+
+function buttondisable(){
+	
 	//disables the post button until post is done 	
 	$(':input[type="submit"]').prop('disabled', true);
      $('input[type="text"]').keyup(function() {
@@ -22,43 +43,17 @@ $(document).ready(function(){
            $(':input[type="submit"]').prop('disabled', false);
         }
     });
-
 	
-	$("#postbtn").click(function(){
-
-		
-
+}
+function settingedit()
+{
 	
-		$("#card-post").hide().show;
-						 	
-		savedPosts = setPost($("#card-post"));
-
-		//changes id 
-		//savedPosts.attr('id','cardPost');
-		
-		//step 1 : change is of comment div 
-		//step 2 chnage id of button
-		
-
-		savedPosts.appendTo(".innerdiv").show();
-		
-		
-	});
-	
-	/*---------------------------------------------------
-					Handles settings 
-	
-	-----------------------------------------------------*/
-	
-	obj = JSON.parse(saveFile);
-	var username;
-	
-	$("#add_listing_info").find(".firstname").html(obj.firstname);
-	$("#add_listing_info").find(".lastname").html(obj.lastname);
-	$("#add_listing_info").find(".birthday").html(obj.birthday);
-	$("#add_listing_info").find(".email").html(obj.email);
-	$("#add_listing_info").find(".phone").html(obj.phone);
-	$("#add_listing_info").find(".username").html(obj.username);
+	$("#add_listing_info").find(".firstname").html('');
+	$("#add_listing_info").find(".lastname").html('');
+	$("#add_listing_info").find(".birthday").html('');
+	$("#add_listing_info").find(".email").html('');
+	$("#add_listing_info").find(".phone").html('');
+	$("#add_listing_info").find(".username").html('');
 	
 	$('#fname').hide(); //Initially form will be hidden.
 	$('#lname').hide();
@@ -90,14 +85,10 @@ $(document).ready(function(){
 			
 			
 		update($("#add_listing_info"));
-			
-			
-		
-		});
-	
-	
 
-});
+		});
+
+}
 /*-----------------------------------------------------
 				download
 function handles downloading json file information 
@@ -110,9 +101,11 @@ to a txt file.
 	//goes through posts 
 	for(var i = 0;i < object.textposts.length;i++)
 	{
-		
+			
 			create = createPost(object,i,$("#card-post"));
 			create.appendTo(".innerdiv").show();
+			
+	
 		
 	}
 
@@ -126,26 +119,34 @@ function handles creating a new post as needed when user
 clicks on post button
 ------------------------------------------------------*/
 
-function setPost(templateCardPost){
+function setPost(templateCardPost,img){
 	
 	var current_post = new Object();
 	var the_post = $('#post')[0];
 	var today = new Date();
 	var date = (today.getMonth()+1)+ '/' +today.getDate()+ ' ' + today.getHours() + ":" + today.getMinutes();	
 	
+	
+	
 	templateCardPost.find(".display").html(the_post.value );
 	templateCardPost.find(".time").html(date);
 
+
 	current_post.datetime = date;
 	current_post.content = the_post.value ; 
-	uploadFile = document.getElementById("file-input").files[0];
+	
+	
+	uploadFile = document.getElementById("file-input").files[0];	
 	if(uploadFile)
 	{
-		uploadPhotoPost(current_post);
+	
+		uploadPhotoPost('myWallJSON.txt', current_post);
+		templateCardPost.find(".upload-image-preview").html(img);  
 	}
 	else
 	{
 		AddPostToWall('myWallJSON.txt', current_post);
+		templateCardPost.find(".upload-image-preview").html('');  
 	}	
 	
 	return templateCardPost.clone();
@@ -160,13 +161,17 @@ function createPost(obj,i,templateCardPost)
 {
 	var old_post = new Object();	
 	
+	img = $('<img>').attr('src', obj.textposts[i].photoLink);
+	
 	templateCardPost.find(".name").html(obj.name);				
 	templateCardPost.find(".display").html(obj.textposts[i].content);
 	templateCardPost.find(".time").html(obj.textposts[i].datetime);
+	templateCardPost.find(".upload-image-preview").html(img);  
 	
 					
 	old_post.datetime = obj.textposts[i].datetime;
-	old_post.content = obj.textposts[i].content;		
+	old_post.content = obj.textposts[i].content;	
+	old_post.photoLink = obj.textposts[i].photoLink;
 	
 	
 	return templateCardPost.clone();
@@ -188,6 +193,15 @@ function createPost(obj,i,templateCardPost)
 	var update_phone = $('#ph')[0];
 	
 	var update_username = $('#user')[0];
+	
+	var updatedSettings = new Object();
+	updatedSettings.username = update_username.value;
+	updatedSettings.firstName = update_firstname.value;
+	updatedSettings.lastName = update_lastname.value;
+	updatedSettings.birthday = update_birthday.value;
+	updatedSettings.email = update_email.value;
+	updatedSettings.phone = update_phone.value;
+	AddPostToWall('mySettingsJSON.txt', updatedSettings);
 	
 	if($('#first')[0].value != '')
 	{
@@ -269,12 +283,7 @@ function handleClientLoad()
 				{
 					//Put here whatever you want to test
 					//AddPostToWall();
-					//addFriend('slayer441139@gmail.com');
-					//getSharedFile();
-					//removePermissions();
-					//addFriend('TonyMalone','slayer441139@gmail.com');
-					//removeFriend('TonyMalone');
-					//getCurrentWall();
+					getCurrentWall();
 				}
 			}
       }
@@ -304,6 +313,7 @@ function handleClientLoad()
 			 'q' : query
 		}).then(function(response) 
 		{
+			console.log(response.result);
 			if( response.result.files.length == 0 )
 			{
 				//If folder is not found (POSN not initialized),
@@ -348,7 +358,7 @@ function handleClientLoad()
 		*/
 		
 		var userSettings = new Object();
-		var settingsName = 'mySettings.txt';
+		var settingsName = 'mySettingsJSON.txt';
 		userSettings.username = 'mattram6'
 		userSettings.firstName = 'Matthew'
 		userSettings.lastName = 'Cook'
@@ -436,7 +446,7 @@ function handleClientLoad()
 			}
 		})
 	}
-		
+	
 	function addFriend(name, emailAddress)
 	{
 		console.log('Add friend');
@@ -822,10 +832,15 @@ function handleClientLoad()
 					{
 						parseString.textposts.push(user_posts);
 					}
-					else
+					if(jsonName == 'myFriendsJSON.txt')
 					{
 						parseString.friendsList.push(user_posts);
 					}
+					else
+					{
+						parseString = user_posts;
+					}
+
 					
 					//Step 3: Create new one with new post in it
 					//Response.body has is current JSON content
@@ -863,6 +878,7 @@ function handleClientLoad()
 			console.log('Error: ' + reason.result.error.message);
 		});
 	}
+
 	
 	function getCurrentWall()
 	{
@@ -878,6 +894,7 @@ function handleClientLoad()
 			'q' : queryList
 		}).then(function(response) 
 		{
+			console.log(response.result);
 				
 			//ID of Wall JSON
 			jsonID = response.result.files[0].id;
@@ -888,7 +905,8 @@ function handleClientLoad()
 				alt : 'media'
 			}).then(function(response)
 			{
-				obj = JSON.parse(response.body);
+				console.log(response.body);
+					obj = JSON.parse(response.body);
 				repopulate(obj);
 
 			}, function(reason)
@@ -979,7 +997,7 @@ function handleClientLoad()
 						parseResponse = JSON.parse(response.body);
 						webLink = parseResponse.webContentLink;
 						current_post.photoLink = webLink;
-						AddPostToWall('myWallJSON.txt', current_post);
+						AddPostToWall(current_post);
 						
 						}), function(reason)
 						{
@@ -1002,6 +1020,7 @@ function handleClientLoad()
 		$el.wrap('<form>').closest('form').get(0).reset();
 		$el.unwrap();
 		uploadFileAfter = document.getElementById("file-input").files[0];
+		console.log(uploadFileAfter);
 	 }
 	
 	  //gives a list of web links for images in the Photos folder
@@ -1201,5 +1220,8 @@ function signOut() {
  
     });
   }
+
+
+
 
 
