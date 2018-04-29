@@ -16,7 +16,7 @@ $(document).ready(function(){
 
 	$("#postbtn").click(function(){
 		
-		$("#card-post").hide().show;
+		
 	
 		if ($("#file-input")[0].files &&$("#file-input")[0].files[0]) {
 			var reader = new FileReader();
@@ -25,7 +25,7 @@ $(document).ready(function(){
 			};
 			reader.readAsDataURL($("#file-input")[0].files[0]);
 		}
-			
+		//$("#card-post").hide().show;	
 		savedPosts = setPost($("#card-post"),img);
 	    savedPosts.appendTo(".innerdiv").show();
 
@@ -61,6 +61,8 @@ function settingedit()
 	$('#ename').hide();
 	$('#pname').hide();
 	$('#uname').hide();
+	$('#uname').hide();
+	$('#Photo').hide();
 
 		$('#fedit').click(function() {
 			$('#fname').show();
@@ -81,10 +83,13 @@ function settingedit()
 		$('#pedit').click(function() {
 			$('#pname').show();
 		});
+		$('#photoedit').click(function() {
+			$('#Photo').show();
+		});
 		$('#submit').click(function() {
 			
 			
-		update($("#add_listing_info"));
+			update($("#add_listing_info"));
 
 		});
 
@@ -104,14 +109,24 @@ to a txt file.
 			
 			create = createPost(object,i,$("#card-post"));
 			create.appendTo(".innerdiv").show();
-			
-	
-		
+
 	}
+
+}
+
+function repopulateSettings(object)
+{
+	
+	$("#add_listing_info").find(".firstname").html(object.firstName);
+	$("#add_listing_info").find(".lastname").html(object.lastName);
+	$("#add_listing_info").find(".birthday").html(object.birthday);
+	$("#add_listing_info").find(".email").html(object.email);
+	$("#add_listing_info").find(".phone").html(object.phone);
+	$("#add_listing_info").find(".username").html(object.username);
+	
 
 	
 }
-
 
 /*-----------------------------------------------------
 				setPost
@@ -126,26 +141,23 @@ function setPost(templateCardPost,img){
 	var today = new Date();
 	var date = (today.getMonth()+1)+ '/' +today.getDate()+ ' ' + today.getHours() + ":" + today.getMinutes();	
 	
-	
-	
 	templateCardPost.find(".display").html(the_post.value );
 	templateCardPost.find(".time").html(date);
-
 
 	current_post.datetime = date;
 	current_post.content = the_post.value ; 
 	
-	
-	uploadFile = document.getElementById("file-input").files[0];	
+	uploadFile = document.getElementById("file-input").files[0];
+
 	if(uploadFile)
 	{
 	
-		uploadPhotoPost('myWallJSON.txt', current_post);
+		uploadPhotoPost(current_post);
 		templateCardPost.find(".upload-image-preview").html(img);  
 	}
 	else
 	{
-		AddPostToWall('myWallJSON.txt', current_post);
+		AddPostToWall('myWallJSON.txt',current_post);
 		templateCardPost.find(".upload-image-preview").html('');  
 	}	
 	
@@ -194,13 +206,17 @@ function createPost(obj,i,templateCardPost)
 	
 	var update_username = $('#user')[0];
 	
+	var img;
+	
 	var updatedSettings = new Object();
+	
 	updatedSettings.username = update_username.value;
 	updatedSettings.firstName = update_firstname.value;
 	updatedSettings.lastName = update_lastname.value;
 	updatedSettings.birthday = update_birthday.value;
 	updatedSettings.email = update_email.value;
 	updatedSettings.phone = update_phone.value;
+	
 	AddPostToWall('mySettingsJSON.txt', updatedSettings);
 	
 	if($('#first')[0].value != '')
@@ -233,15 +249,24 @@ function createPost(obj,i,templateCardPost)
 		
 	}
 	
+	//handles user photo 
+	 if ($("#filePhoto")[0].files && $("#filePhoto")[0].files[0]) {
+		var reader = new FileReader();
+			reader.onload = function(e) {
+			$('#previewHolder').attr('src', e.target.result);
+		}
+
+		reader.readAsDataURL($("#filePhoto")[0].files[0]);
+	}
+
+
 	$('#fname').hide(); //Initially form will be hidden.
 	$('#lname').hide();
 	$('#bname').hide();
 	$('#ename').hide();
 	$('#pname').hide();
 	$('#uname').hide();
-	
-
-	
+	$('#Photo').hide();
 }
 /*------------------------------------------------
 				Google API
@@ -283,7 +308,8 @@ function handleClientLoad()
 				{
 					//Put here whatever you want to test
 					//AddPostToWall();
-					getCurrentWall();
+					getCurrentWall('myWallJSON.txt');
+					getCurrentWall('mySettingsJSON.txt');
 				}
 			}
       }
@@ -313,7 +339,6 @@ function handleClientLoad()
 			 'q' : query
 		}).then(function(response) 
 		{
-			console.log(response.result);
 			if( response.result.files.length == 0 )
 			{
 				//If folder is not found (POSN not initialized),
@@ -880,10 +905,10 @@ function handleClientLoad()
 	}
 
 	
-	function getCurrentWall()
+	function getCurrentWall(jsonName)
 	{
 		//Variables for finding JSON file
-		var jsonName = "name= " + "'myWallJSON.txt'";
+		var jsonName = `name= '${jsonName}'`;
 		var isTrashed = "trashed = false"
 		var queryList = jsonName + 'and' + isTrashed;
 		var jsonID;
@@ -906,8 +931,15 @@ function handleClientLoad()
 			}).then(function(response)
 			{
 				console.log(response.body);
-					obj = JSON.parse(response.body);
-				repopulate(obj);
+				obj = JSON.parse(response.body);
+				if( jsonName == 'myWallJSON.txt')
+				{
+					repopulate(obj);
+				}
+				else
+				{
+					repopulateSettings(obj);
+				}
 
 			}, function(reason)
 			{
@@ -997,7 +1029,7 @@ function handleClientLoad()
 						parseResponse = JSON.parse(response.body);
 						webLink = parseResponse.webContentLink;
 						current_post.photoLink = webLink;
-						AddPostToWall(current_post);
+						AddPostToWall('myWallJSON.txt', current_post);
 						
 						}), function(reason)
 						{
@@ -1035,21 +1067,21 @@ function handleClientLoad()
 		var isTrashed = "trashed = false"
 		//Function returns a list of files in google drive
         var listPromise = Promise.resolve(gapi.client.drive.files.list(
-			{    
-				 'orderBy': order,
-				 'q' : photoDirectory
-			}).then(function(response) 
-			{
-				console.log(response.result.files);
-				var filesList = response.result.files;
-				var webLinkList = [];
-				getWebLinks( filesList, webLinkList );
-				return webLinkList;
-			}, function(reason) 
-			{
-				console.log('Error: ' + reason.result.error.message);
-				apiBackoff(getPhotoLinks());
-			}));
+		{    
+			'orderBy': order,
+			'q' : photoDirectory
+		}).then(function(response) 
+		{
+			console.log(response.result.files);
+			var filesList = response.result.files;
+			var webLinkList = [];
+			getWebLinks( filesList, webLinkList );
+			return webLinkList;
+		}, function(reason) 
+		{
+			console.log('Error: ' + reason.result.error.message);
+			apiBackoff(getPhotoLinks());
+		}));
 			
 		listPromise.then(function(value)
 		{
@@ -1142,21 +1174,21 @@ function handleClientLoad()
 	}
 	  	
 		
-		//Old, unfinished, or unused functions
-		//listed below:
+	//Old, unfinished, or unused functions
+	//listed below:
 		
-		//Unused
-		function sleep(ms) 
-		{
-			return new Promise(resolve => setTimeout(resolve, ms));
-		}
+	//Unused
+	function sleep(ms) 
+	{
+		return new Promise(resolve => setTimeout(resolve, ms));
+	}
 
-		async function demo() 
-		{
-			console.log('Taking a break...');
-			await sleep(1000);
-			console.log('Two second later');
-		}
+	async function demo() 
+	{
+		console.log('Taking a break...');
+		await sleep(1000);
+		console.log('Two second later');
+	}
 
 	//Works but cannot return
 	function getFileId( fileName )
