@@ -5,11 +5,11 @@ li a:hover {
 	
 .boxed{
 	border-radius: 28px;  
-	font-size: 35px; 
+	font-size: 15px; 
 	background: #9932CC; 
 	padding: 20px 60px 15px 60px; 
 	margin: auto; 
-	width: 300px; 
+	width: 400px; 
 	line-height: 70%;  
 	text-align: center; 
 }
@@ -149,6 +149,8 @@ p{
     background-color: #FFFFFF;
 	border-radius: 25px;
     color: purple;
+	font-family: 'Mako'; 
+	font-size: 12px; 
 	
 }
 .login input[type=button]:hover {
