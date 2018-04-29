@@ -327,13 +327,13 @@ function handleClientLoad()
 		user_posts.name = "wholmes";
 		user_posts.picture = "./Personal Profile Template_files/user.jpg";
 		user_posts.textposts = [];
-		parseUser = JSON.stringify(user_posts);
+		jsonUser = JSON.stringify(user_posts);
 		
 		//Default values for friend JSON
 		var friend = new Object();
 		var friendFileName = 'myFriendsJSON.txt'
 		friend.friendsList = [];
-		parseFriends = JSON.stringify(friend);
+		jsonFriends = JSON.stringify(friend);
 		
 		/*
 		//Get Profile information for default settings
@@ -346,6 +346,16 @@ function handleClientLoad()
 		userSettings.userEmail = profile.getEmail();
 		parseSettings = JSON.stringify(userSettings);
 		*/
+		
+		var userSettings = new Object();
+		var settingsName = 'mySettings.txt';
+		userSettings.username = 'mattram6'
+		userSettings.firstName = 'Matthew'
+		userSettings.lastName = 'Cook'
+		userSettings.birthday = '06/08/1996'
+		userSettings.email = 'matthewcook@nevada.unr.edu'
+		userSettings.phone = '916-757-7074'
+		jsonSettings = JSON.stringify(userSettings);
 		
 		subFolderNames = ['POSN_Photos','POSN_Comments','POSN_Music','POSN_Videos','POSN_Other_Files']
 		mimeType = 'application/vnd.google-apps.folder'
@@ -362,8 +372,9 @@ function handleClientLoad()
 		{
 			console.log(response.result);
 			makeSubFolders(response.result.id, subFolderNames);
-			postJSON(wallJsonName, response.result.id, parseUser);
-			postJSON(friendFileName, response.result.id, parseFriends);
+			postJSON(wallJsonName, response.result.id, jsonUser);
+			postJSON(friendFileName, response.result.id, jsonFriends);
+			postJSON(settingsName, response.result.id, jsonSettings);
 			//postJSON(settingsName, response.result.id, parseSettings);
 			
         }, function(reason) 
