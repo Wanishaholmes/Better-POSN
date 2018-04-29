@@ -114,6 +114,19 @@ to a txt file.
 
 }
 
+function repopulateSettings(object)
+{
+	
+	$("#add_listing_info").find(".firstname").html(object.firstName);
+	$("#add_listing_info").find(".lastname").html(object.lastName);
+	$("#add_listing_info").find(".birthday").html(object.birthday);
+	$("#add_listing_info").find(".email").html(object.email);
+	$("#add_listing_info").find(".phone").html(object.phone);
+	$("#add_listing_info").find(".username").html(object.username);
+	
+
+	
+}
 
 /*-----------------------------------------------------
 				setPost
