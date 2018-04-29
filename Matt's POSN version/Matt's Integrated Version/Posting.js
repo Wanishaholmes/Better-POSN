@@ -157,7 +157,7 @@ function setPost(templateCardPost,img){
 	}
 	else
 	{
-		AddPostToWall('myWallJSON.txt',current_post);
+		AddDataToJSON('myWallJSON.txt',current_post);
 		templateCardPost.find(".upload-image-preview").html('');  
 	}	
 	
@@ -208,15 +208,6 @@ function createPost(obj,i,templateCardPost)
 	
 	var img;
 	
-	var updatedSettings = new Object();
-	
-	updatedSettings.username = update_username.value;
-	updatedSettings.firstName = update_firstname.value;
-	updatedSettings.lastName = update_lastname.value;
-	updatedSettings.birthday = update_birthday.value;
-	updatedSettings.email = update_email.value;
-	updatedSettings.phone = update_phone.value;
-	
 	if($('#first')[0].value != '')
 	{
 		
@@ -246,6 +237,16 @@ function createPost(obj,i,templateCardPost)
 		$("#add_listing_info").find(".username").html(update_username.value);
 		
 	}
+	
+	
+	var updatedSettings = new Object();
+	
+	updatedSettings.username = update_username.value;
+	updatedSettings.firstName = update_firstname.value;
+	updatedSettings.lastName = update_lastname.value;
+	updatedSettings.birthday = update_birthday.value;
+	updatedSettings.email = update_email.value;
+	updatedSettings.phone = update_phone.value;
 	
 		//Read in file to be uploaded from upload button
 		var uploadFile = document.getElementById("filePhoto").files[0];
@@ -318,7 +319,7 @@ function createPost(obj,i,templateCardPost)
 						parseResponse = JSON.parse(response.body);
 						webLink = parseResponse.webContentLink;
 						updatedSettings.profilePic = webLink;
-						AddPostToWall('mySettingsJSON.txt', updatedSettings);
+						AddDataToJSON('mySettingsJSON.txt', updatedSettings);
 						
 						}), function(reason)
 						{
@@ -391,8 +392,8 @@ function handleClientLoad()
 				{
 					//Put here whatever you want to test
 					//getSharedFile('wholmes');
-					getCurrentWall('myWallJSON.txt');
-					getCurrentWall('mySettingsJSON.txt');
+					getAppJSON('myWallJSON.txt');
+					getAppJSON('mySettingsJSON.txt');
 				}
 			}
       }
@@ -591,7 +592,7 @@ function handleClientLoad()
 			}).then(function(response)
 			{
 				newFriend.permissionID = response.result.id
-				AddPostToWall('myFriendsJSON.txt', newFriend);
+				AddDataToJSON('myFriendsJSON.txt', newFriend);
 			}, function(reason)
 			{
 				console.log('Error: ' + reason.result.error.message);
@@ -848,7 +849,7 @@ function handleClientLoad()
 		}
 	 }
 	 
-	// Function posts updated Wall JSON to Google Drive
+	// Function posts updated JSON file (settings, wall, or friends) to Google Drive
 	function postJSON( fileName, directoryID, fileContent )
 	{
 		var directory = [directoryID];
@@ -888,15 +889,9 @@ function handleClientLoad()
 	}
 	
 	
-	//Function meant to handle adding a new post to the Wall JSON in Google Drive
-	//Essentially in four steps:
-	//1. Find POSN_Directory
-	//2. Find and download current Wall JSON
-	//3. Append new post to Wall JSON
-	//4. Post updated Wall JSON
-	//5. Delete old Wall JSON
-
-	function AddPostToWall(jsonName, user_posts)
+	//Function meant to handle adding a new post new data to
+	//files used for the application i.e. settings, wall, friends
+	function AddDataToJSON(jsonName, user_posts)
 	{
 		//Variables for finding POSN_Directory
 		var dirName = "name= " + "'POSN_Directory'";
@@ -939,13 +934,13 @@ function handleClientLoad()
 				{
 				
 					parseString = JSON.parse(response.body);
-					
 					//Choose what type of file is being updated
 					if(jsonName == 'myWallJSON.txt')
 					{
+						console.log
 						parseString.textposts.push(user_posts);
 					}
-					if(jsonName == 'myFriendsJSON.txt')
+					else if(jsonName == 'myFriendsJSON.txt')
 					{
 						parseString.friendsList.push(user_posts);
 					}
@@ -993,23 +988,22 @@ function handleClientLoad()
 	}
 
 	
-	function getCurrentWall(jsonName)
+	function getAppJSON(jsonName)
 	{
 		//Variables for finding JSON file
-		var jsonName = `name= '${jsonName}'`;
+		var jsonQuery = `name= '${jsonName}'`;
 		var isTrashed = "trashed = false"
 		var sharedParam = "'me' in owners";
-		var queryList = jsonName + 'and' + isTrashed + 'and' + sharedParam;
+		var queryList = jsonQuery + 'and' + isTrashed + 'and' + sharedParam;
 		var jsonID;
 		var obj;
+		
 		//Find Wall JSON ID
 		gapi.client.drive.files.list(
 		{    
 			'q' : queryList
 		}).then(function(response) 
-		{
-			console.log(response.result);
-				
+		{				
 			//ID of Wall JSON
 			jsonID = response.result.files[0].id;
 				
@@ -1019,7 +1013,6 @@ function handleClientLoad()
 				alt : 'media'
 			}).then(function(response)
 			{
-				console.log(response.body);
 				obj = JSON.parse(response.body);
 				if( jsonName == 'myWallJSON.txt')
 				{
@@ -1118,7 +1111,7 @@ function handleClientLoad()
 						parseResponse = JSON.parse(response.body);
 						webLink = parseResponse.webContentLink;
 						current_post.photoLink = webLink;
-						AddPostToWall('myWallJSON.txt', current_post);
+						AddDataToJSON('myWallJSON.txt', current_post);
 						
 						}), function(reason)
 						{
