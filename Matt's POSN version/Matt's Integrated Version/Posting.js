@@ -217,8 +217,6 @@ function createPost(obj,i,templateCardPost)
 	updatedSettings.email = update_email.value;
 	updatedSettings.phone = update_phone.value;
 	
-	AddPostToWall('mySettingsJSON.txt', updatedSettings);
-	
 	if($('#first')[0].value != '')
 	{
 		
@@ -249,16 +247,101 @@ function createPost(obj,i,templateCardPost)
 		
 	}
 	
-	//handles user photo 
-	 if ($("#filePhoto")[0].files && $("#filePhoto")[0].files[0]) {
-		var reader = new FileReader();
-			reader.onload = function(e) {
-			$('#previewHolder').attr('src', e.target.result);
+		//Read in file to be uploaded from upload button
+		var uploadFile = document.getElementById("filePhoto").files[0];
+		var fileContent; 
+		if (uploadFile) 
+		{
+			var name = uploadFile.name;
+			var fileSize = uploadFile.size;
+			var mimeType = uploadFile.type;
+			var reader = new FileReader();
+			reader.readAsBinaryString(uploadFile);
+			reader.onload = function (evt) 
+			{
+				var dirName = "name= " + "'POSN_Photos'";
+				var isTrashed = "trashed = false"
+				var dirQuery = dirName + 'and' + isTrashed;
+				
+				gapi.client.drive.files.list(
+				{
+					'q' : dirQuery
+				}).then(function(response)
+				{
+					PhotoFolderID = response.result.files[0].id;
+				
+					document.getElementById("filePhoto").innerHTML = evt.target.result;
+						
+					//evt.target.result is actual text/data in file
+					//Encoded in base64
+					fileContent = btoa(evt.target.result);	
+						
+					//Rest of function below handles uploading to Google Drive
+					var auth_token = gapi.client.getToken().access_token;
+					const boundary = '-------314159265358979323846';
+					const delimiter = "\r\n--" + boundary + "\r\n";
+					const close_delim = "\r\n--" + boundary + "--";
+					var metadata = 
+					{ 
+						 "name" : name,
+						 "mimeType": mimeType,
+						 "parents" : [PhotoFolderID]
+					};  
+
+					var multipartRequestBody =
+					delimiter +  'Content-Type: application/json\r\n\r\n' +
+					JSON.stringify(metadata) +
+					delimiter +
+					'Content-Type: application/json' + '\n' +
+					'Content-Transfer-Encoding: base64\r\n\r\n' +
+					fileContent +
+					close_delim;
+					gapi.client.request(
+					{ 
+						'path': '/upload/drive/v3/files/',
+						'method': 'POST',
+						'params': {'uploadType': 'multipart'},
+						'headers': { 'Content-Type': 'multipart/form-data; boundary="' + boundary + '"', 'Authorization': 'Bearer ' + auth_token, },
+						'body': multipartRequestBody 
+					}).execute(function(file) 
+					{ 
+						console.log("Wrote to file " + file.name + " id: " + file.id); 
+						
+						photoID = file.id;
+						gapi.client.drive.files.get(
+						{
+							'fileId': photoID,
+							fields: 'webContentLink'
+						}).then(function(response)
+						{
+							
+						parseResponse = JSON.parse(response.body);
+						webLink = parseResponse.webContentLink;
+						updatedSettings.profilePic = webLink;
+						AddPostToWall('mySettingsJSON.txt', updatedSettings);
+						
+						}), function(reason)
+						{
+							console.log(reason);
+						};					
+				
+					}, function(error){
+							console.log(error);
+					});
+				}), function(reason)
+				{
+						console.log(reason);
+				}  
+			}
+			reader.onerror = function (evt) {
+				document.getElementById("filePhoto").innerHTML = "error reading file";
+			}
 		}
-
-		reader.readAsDataURL($("#filePhoto")[0].files[0]);
-	}
-
+		var $el = $('#filePhoto');
+		$el.wrap('<form>').closest('form').get(0).reset();
+		$el.unwrap();
+		uploadFileAfter = document.getElementById("filePhoto").files[0];
+		
 
 	$('#fname').hide(); //Initially form will be hidden.
 	$('#lname').hide();
@@ -307,7 +390,7 @@ function handleClientLoad()
 				if( isPOSNSetup() == true)
 				{
 					//Put here whatever you want to test
-					//AddPostToWall();
+					//getSharedFile('wholmes');
 					getCurrentWall('myWallJSON.txt');
 					getCurrentWall('mySettingsJSON.txt');
 				}
@@ -344,6 +427,7 @@ function handleClientLoad()
 				//If folder is not found (POSN not initialized),
 				//then initialize setup 
 				setupPOSN();
+				
 			}
 			console.log("POSN is setup");
         }, function(reason) 
@@ -359,7 +443,7 @@ function handleClientLoad()
 		//Default values for Wall JSON
 		var user_posts = new Object();
 		var wallJsonName = 'myWallJSON.txt';
-		user_posts.name = "wholmes";
+		user_posts.name = "Matt";
 		user_posts.picture = "./Personal Profile Template_files/user.jpg";
 		user_posts.textposts = [];
 		jsonUser = JSON.stringify(user_posts);
@@ -491,6 +575,7 @@ function handleClientLoad()
 		var fileName = "name= 'myWallJSON.txt'";
 		var isTrashed = "trashed = false"
 		var query = fileName + 'and' + isTrashed;
+		var sendNotif = false;
 		var fileID;
 		gapi.client.drive.files.list(
 		{    
@@ -501,6 +586,7 @@ function handleClientLoad()
 			gapi.client.drive.permissions.create(
 			{
 				'fileId' : fileID,
+				'sendNotificationEmail' : sendNotif, 
 				resource : requestBody
 			}).then(function(response)
 			{
@@ -516,12 +602,13 @@ function handleClientLoad()
 		});
 	}
 	
-	function getSharedFile()
+	function getSharedFile(friendName)
 	{
 		var fileName = "name= 'myWallJSON.txt'";
+		var fullText = `fullText contains '${friendName}'`
 		var isTrashed = "trashed = false"
 		var sharedParam = "sharedWithMe = true";
-		var query = fileName + 'and' + isTrashed + 'and' + sharedParam;
+		var query = fileName + 'and' + isTrashed + 'and' + sharedParam + 'and' + fullText;
 		console.log(query);
 		gapi.client.drive.files.list(
 		{    
@@ -529,7 +616,6 @@ function handleClientLoad()
 		}).then(function(response) 
 		{
 			fileID = response.result.files[0].id
-			console.log(fileID);
 			gapi.client.drive.files.get(
 			{    
 				'fileId' : fileID,
@@ -821,7 +907,9 @@ function handleClientLoad()
 		//Variables for finding JSON file
 		var fileName = jsonName;
 		var queryName = `name= '${jsonName}'`;
-		var queryList = queryName + 'and' + isTrashed;
+		var sharedParam = "'me' in owners";
+		var queryList = queryName + 'and' + isTrashed + 'and' + sharedParam;
+
 		var jsonID;
 		
 		//Step 1: Find POSN_Directory ID
@@ -910,7 +998,8 @@ function handleClientLoad()
 		//Variables for finding JSON file
 		var jsonName = `name= '${jsonName}'`;
 		var isTrashed = "trashed = false"
-		var queryList = jsonName + 'and' + isTrashed;
+		var sharedParam = "'me' in owners";
+		var queryList = jsonName + 'and' + isTrashed + 'and' + sharedParam;
 		var jsonID;
 		var obj;
 		//Find Wall JSON ID

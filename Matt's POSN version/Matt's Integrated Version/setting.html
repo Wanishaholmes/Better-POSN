@@ -90,6 +90,19 @@
 										<!-- Text input-->
 							<div class="add_listing_info" id = "add_listing_info">
 								<h3>Personal Information</h3>
+								<div class="form-group" >
+									<img id="previewHolder" class="profile-img"  style="width:128px;height:128px;" />
+						
+									<button id ="photoedit" class = "stg-btn" type = "button" style= "float:right"> edit</button>
+									
+										<div id = "Photo" class = "Photo">
+										
+										 <input type="file" name="filePhoto" value="" id="filePhoto" class="required borrowerImageFile" data-errormsg="PhotoUploadErrorMsg">
+									</div>
+							
+								</div>
+								
+								
 								
 								<div class="form-group" >
 									<label class="col-md-4 control-label" for="name">Username<span class="required">*</span></label>
@@ -169,6 +182,9 @@
 
 								
 							</div>
+							
+							
+							
 
 							<!-- Button that handles u-->
 							<div class="form-group">
@@ -187,13 +203,13 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 		<script src ="./Posting.js"></script>
-		<script src = "./API.js" </script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 		<script async defer src="https://apis.google.com/js/api.js"
 		onload="this.onload=handleClientLoad()"
 		onreadystatechange="if (this.readyState === 'complete') this.onload()">
+		
 		</script>
-	
+
 
 	</body>
 </html>
