@@ -1,3 +1,4 @@
+var saveImage;
 $(document).ready(function(){
 	var savedPosts;
 	var img;
@@ -12,46 +13,49 @@ $(document).ready(function(){
 	$("#card-post").hide(); 
 	
 	settingedit();
-	buttondisable();
 
+
+	
 	$("#postbtn").click(function(){
 		
+
 			
-		if ($("#file-input")[0].files &&$("#file-input")[0].files[0]) {
+	if ($("#file-input")[0].files &&$("#file-input")[0].files[0]) {
 			var reader = new FileReader();
 			reader.onload = function (e) {
 				img = $('<img>').attr('src', e.target.result);
+				console.log(img);
+				imageSet(img);
+				
 			};
 			reader.readAsDataURL($("#file-input")[0].files[0]);
+			
+		}else{
+			
+			imageSet(img);
 		}
 
-		savedPosts = setPost($("#card-post"),img);
-	    savedPosts.appendTo(".innerdiv").show();
 
-		$('#post').val('');
+			
 	});
 	
 });
+
+function imageSet(img)
+{
+		
+		saveImage = img;
+		savedPosts = setPost($("#card-post"),img);		
+	    savedPosts.appendTo(".innerdiv").show();
+}	
+
 function updateUsername_photo(user,pic)
 {
 	$('#sidebar').find(".user").html(user);
 	$('#profilePhoto').attr('src', pic);
-	
-	
-	
-	
+
 }
-function buttondisable(){
-	
-	//disables the post button until post is done 	
-	$(':input[type="submit"]').prop('disabled', true);
-     $('input[type="text"]').keyup(function() {
-        if($(this).val() != '') {
-           $(':input[type="submit"]').prop('disabled', false);
-        }
-    });
-	
-}
+
 function settingedit()
 {
 	
@@ -155,7 +159,7 @@ function setPost(templateCardPost,img){
 	current_post.content = the_post.value ; 
 	
 	uploadFile = document.getElementById("file-input").files[0];
-
+	console.log(uploadFile);
 	if(uploadFile)
 	{
 		templateCardPost.find(".upload-image-preview").html(img); 
@@ -418,9 +422,9 @@ function handleClientLoad()
 				if( isPOSNSetup() == true)
 				{
 					
-					getAppJSON('myWallJSON.txt');
+					getCurrentWall('myWallJSON.txt');
 	
-					getAppJSON('mySettingsJSON.txt');
+					getCurrentWall('mySettingsJSON.txt');
 				
 				}
 				
@@ -456,7 +460,6 @@ function handleClientLoad()
 			{
 				//If folder is not found (POSN not initialized),
 				//then initialize setup 
-				return ("./setting.html"); // takes user to settings page if they dont have a POSN account
 				setupPOSN();
 				
 				
@@ -611,7 +614,7 @@ function handleClientLoad()
 			}).then(function(response)
 			{
 				newFriend.permissionID = response.result.id
-				AddDataToJSON('myFriendsJSON.txt', newFriend);
+				AddPostToWall('myFriendsJSON.txt', newFriend);
 			}, function(reason)
 			{
 				console.log('Error: ' + reason.result.error.message);
@@ -908,16 +911,15 @@ function handleClientLoad()
 	}
 	
 	
-	//Function meant to handle adding a new post new data to
-	//files used for the application i.e. settings, wall, friends
-	
+	//Function meant to handle adding a new post to the Wall JSON in Google Drive
+	//Essentially in four steps:
 	//1. Find POSN_Directory
-	//2. Find and download current JSON
-	//3. Append new post to JSON
-	//4. Post updated JSON
-	//5. Delete old JSON
+	//2. Find and download current Wall JSON
+	//3. Append new post to Wall JSON
+	//4. Post updated Wall JSON
+	//5. Delete old Wall JSON
 
-	function AddDataToJSON(jsonName, user_posts)
+	function AddPostToWall(jsonName, user_posts)
 	{
 		//Variables for finding POSN_Directory
 		var dirName = "name= " + "'POSN_Directory'";
@@ -1011,8 +1013,8 @@ function handleClientLoad()
 		});
 	}
 
-	//Gets JSON from cloud for populating settings or wall page
-	function getAppJSON(jsonName)
+	
+	function getCurrentWall(jsonName)
 	{
 		//Variables for finding JSON file
 		var jsonQuery = `name= '${jsonName}'`;
@@ -1069,7 +1071,7 @@ function handleClientLoad()
 	{
 		//Read in file to be uploaded from upload button
 		var uploadFile = document.getElementById("file-input").files[0];
-		console.log(uploadFile);
+
 		var fileContent; 
 		if (uploadFile) 
 		{
@@ -1140,7 +1142,7 @@ function handleClientLoad()
 						parseResponse = JSON.parse(response.body);
 						webLink = parseResponse.webContentLink;
 						current_post.photoLink = webLink;
-						AddDataToJSON('myWallJSON.txt', current_post);
+						AddPostToWall('myWallJSON.txt', current_post);
 						
 						}), function(reason)
 						{
@@ -1363,6 +1365,11 @@ function signOut() {
  
     });
   }
+
+
+
+
+
 
 
 
