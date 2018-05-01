@@ -456,7 +456,7 @@ function handleClientLoad()
 			{
 				//If folder is not found (POSN not initialized),
 				//then initialize setup 
-				return ("./settings.html"); // takes user to settings page if they dont have a POSN account
+				return ("./setting.html"); // takes user to settings page if they dont have a POSN account
 				setupPOSN();
 				
 				
