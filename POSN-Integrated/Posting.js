@@ -166,7 +166,7 @@ function setPost(templateCardPost,img){
 	else
 	{
 		templateCardPost.find(".upload-image-preview").html('');  
-		AddPostToWall('myWallJSON.txt',current_post);
+		AddDataToJSON('myWallJSON.txt',current_post);
 		
 	}	
 	
@@ -226,7 +226,7 @@ function createPost(obj,i,templateCardPost)
 	updatedSettings.email = update_email.value;
 	updatedSettings.phone = update_phone.value;
 	
-	AddPostToWall('mySettingsJSON.txt', updatedSettings);
+	AddDataToJSON('mySettingsJSON.txt', updatedSettings);
 	
 	if($('#first')[0].value != '')
 	{
@@ -344,7 +344,7 @@ function createPost(obj,i,templateCardPost)
 						parseResponse = JSON.parse(response.body);
 						webLink = parseResponse.webContentLink;
 						updatedSettings.profilePic = webLink;
-						AddPostToWall('mySettingsJSON.txt', updatedSettings);
+						AddDataToJSON('mySettingsJSON.txt', updatedSettings);
 						
 						}), function(reason)
 						{
@@ -419,9 +419,9 @@ function handleClientLoad()
 				if( isPOSNSetup() == true)
 				{
 					
-					getCurrentWall('myWallJSON.txt');
+					getAppJSON('myWallJSON.txt');
 	
-					getCurrentWall('mySettingsJSON.txt');
+					getAppJSON('mySettingsJSON.txt');
 				
 				}
 				
@@ -611,7 +611,7 @@ function handleClientLoad()
 			}).then(function(response)
 			{
 				newFriend.permissionID = response.result.id
-				AddPostToWall('myFriendsJSON.txt', newFriend);
+				AddDataToJSON('myFriendsJSON.txt', newFriend);
 			}, function(reason)
 			{
 				console.log('Error: ' + reason.result.error.message);
@@ -908,15 +908,16 @@ function handleClientLoad()
 	}
 	
 	
-	//Function meant to handle adding a new post to the Wall JSON in Google Drive
-	//Essentially in four steps:
+	//Function meant to handle adding a new post new data to
+	//files used for the application i.e. settings, wall, friends
+	
 	//1. Find POSN_Directory
-	//2. Find and download current Wall JSON
-	//3. Append new post to Wall JSON
-	//4. Post updated Wall JSON
-	//5. Delete old Wall JSON
+	//2. Find and download current JSON
+	//3. Append new post to JSON
+	//4. Post updated JSON
+	//5. Delete old JSON
 
-	function AddPostToWall(jsonName, user_posts)
+	function AddDataToJSON(jsonName, user_posts)
 	{
 		//Variables for finding POSN_Directory
 		var dirName = "name= " + "'POSN_Directory'";
@@ -1010,8 +1011,8 @@ function handleClientLoad()
 		});
 	}
 
-	
-	function getCurrentWall(jsonName)
+	//Gets JSON from cloud for populating settings or wall page
+	function getAppJSON(jsonName)
 	{
 		//Variables for finding JSON file
 		var jsonQuery = `name= '${jsonName}'`;
@@ -1139,7 +1140,7 @@ function handleClientLoad()
 						parseResponse = JSON.parse(response.body);
 						webLink = parseResponse.webContentLink;
 						current_post.photoLink = webLink;
-						AddPostToWall('myWallJSON.txt', current_post);
+						AddDataToJSON('myWallJSON.txt', current_post);
 						
 						}), function(reason)
 						{
