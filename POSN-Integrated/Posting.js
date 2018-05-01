@@ -345,6 +345,7 @@ function handleClientLoad()
 			{
 				//If folder is not found (POSN not initialized),
 				//then initialize setup 
+				return "./setting.html"; // direct user to settings page 
 				setupPOSN();
 			}
 			console.log("POSN is setup");
