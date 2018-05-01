@@ -1,4 +1,4 @@
-var saveImage;
+
 $(document).ready(function(){
 	var savedPosts;
 	var img;
@@ -51,8 +51,11 @@ function imageSet(img)
 
 function updateUsername_photo(user,pic)
 {
+	console.log("hi");
+	$('#userPhoto').attr('src',pic);
 	$('#sidebar').find(".user").html(user);
 	$('#profilePhoto').attr('src', pic);
+
 
 }
 
@@ -421,10 +424,11 @@ function handleClientLoad()
 				//If POSN is not setup then setup
 				if( isPOSNSetup() == true)
 				{
+					getCurrentWall('mySettingsJSON.txt');
 					
 					getCurrentWall('myWallJSON.txt');
 	
-					getCurrentWall('mySettingsJSON.txt');
+					
 				
 				}
 				
@@ -499,6 +503,7 @@ function handleClientLoad()
 		userSettings.birthday = ''
 		userSettings.email =''
 		userSettings.phone = ''
+		userSettings.profilePic= ''
 		jsonSettings = JSON.stringify(userSettings);
 		
 		subFolderNames = ['POSN_Photos','POSN_Comments','POSN_Music','POSN_Videos','POSN_Other_Files']
@@ -1044,7 +1049,7 @@ function handleClientLoad()
 				
 				if( jsonName == 'myWallJSON.txt')
 				{
-					console.log("in");
+				
 					repopulate(obj);
 					
 					
@@ -1365,6 +1370,12 @@ function signOut() {
  
     });
   }
+
+
+
+
+
+
 
 
 
