@@ -16,8 +16,7 @@ $(document).ready(function(){
 
 	$("#postbtn").click(function(){
 		
-		
-	
+			
 		if ($("#file-input")[0].files &&$("#file-input")[0].files[0]) {
 			var reader = new FileReader();
 			reader.onload = function (e) {
@@ -25,15 +24,24 @@ $(document).ready(function(){
 			};
 			reader.readAsDataURL($("#file-input")[0].files[0]);
 		}
-		//$("#card-post").hide().show;	
+
 		savedPosts = setPost($("#card-post"),img);
 	    savedPosts.appendTo(".innerdiv").show();
 
 		$('#post').val('');
-	});
+		
+
 	
 });
-
+function updateUsername_photo(user,pic)
+{
+	$('#sidebar').find(".user").html(user);
+	$('#profilePhoto').attr('src', pic);
+	
+	
+	
+	
+}
 function buttondisable(){
 	
 	//disables the post button until post is done 	
@@ -48,12 +56,7 @@ function buttondisable(){
 function settingedit()
 {
 	
-	$("#add_listing_info").find(".firstname").html('');
-	$("#add_listing_info").find(".lastname").html('');
-	$("#add_listing_info").find(".birthday").html('');
-	$("#add_listing_info").find(".email").html('');
-	$("#add_listing_info").find(".phone").html('');
-	$("#add_listing_info").find(".username").html('');
+
 	
 	$('#fname').hide(); //Initially form will be hidden.
 	$('#lname').hide();
@@ -123,10 +126,15 @@ function repopulateSettings(object)
 	$("#add_listing_info").find(".email").html(object.email);
 	$("#add_listing_info").find(".phone").html(object.phone);
 	$("#add_listing_info").find(".username").html(object.username);
-	
+	$('#previewHolder').attr('src', object. profilePic);
+
+	updateUsername_photo(object.username,object. profilePic);
+
+
 
 	
 }
+
 
 /*-----------------------------------------------------
 				setPost
@@ -151,14 +159,15 @@ function setPost(templateCardPost,img){
 
 	if(uploadFile)
 	{
-	
+		templateCardPost.find(".upload-image-preview").html(img); 
 		uploadPhotoPost(current_post);
-		templateCardPost.find(".upload-image-preview").html(img);  
+		 
 	}
 	else
 	{
-		AddPostToWall('myWallJSON.txt',current_post);
 		templateCardPost.find(".upload-image-preview").html('');  
+		AddPostToWall('myWallJSON.txt',current_post);
+		
 	}	
 	
 	return templateCardPost.clone();
@@ -248,18 +257,118 @@ function createPost(obj,i,templateCardPost)
 		$("#add_listing_info").find(".username").html(update_username.value);
 		
 	}
-	
+
+
 	//handles user photo 
 	 if ($("#filePhoto")[0].files && $("#filePhoto")[0].files[0]) {
 		var reader = new FileReader();
 			reader.onload = function(e) {
+				
+			
 			$('#previewHolder').attr('src', e.target.result);
+				
 		}
 
 		reader.readAsDataURL($("#filePhoto")[0].files[0]);
+	
 	}
+	
+		//Read in file to be uploaded from upload button
+		var uploadFile = document.getElementById("filePhoto").files[0];
+		var fileContent; 
+		if (uploadFile) 
+		{
+			var name = uploadFile.name;
+			var fileSize = uploadFile.size;
+			var mimeType = uploadFile.type;
+			var reader = new FileReader();
+			reader.readAsBinaryString(uploadFile);
+			reader.onload = function (evt) 
+			{
+				var dirName = "name= " + "'POSN_Photos'";
+				var isTrashed = "trashed = false"
+				var dirQuery = dirName + 'and' + isTrashed;
+				
+				gapi.client.drive.files.list(
+				{
+					'q' : dirQuery
+				}).then(function(response)
+				{
+					PhotoFolderID = response.result.files[0].id;
+				
+					document.getElementById("filePhoto").innerHTML = evt.target.result;
+						
+					//evt.target.result is actual text/data in file
+					//Encoded in base64
+					fileContent = btoa(evt.target.result);	
+						
+					//Rest of function below handles uploading to Google Drive
+					var auth_token = gapi.client.getToken().access_token;
+					const boundary = '-------314159265358979323846';
+					const delimiter = "\r\n--" + boundary + "\r\n";
+					const close_delim = "\r\n--" + boundary + "--";
+					var metadata = 
+					{ 
+						 "name" : name,
+						 "mimeType": mimeType,
+						 "parents" : [PhotoFolderID]
+					};  
 
+					var multipartRequestBody =
+					delimiter +  'Content-Type: application/json\r\n\r\n' +
+					JSON.stringify(metadata) +
+					delimiter +
+					'Content-Type: application/json' + '\n' +
+					'Content-Transfer-Encoding: base64\r\n\r\n' +
+					fileContent +
+					close_delim;
+					gapi.client.request(
+					{ 
+						'path': '/upload/drive/v3/files/',
+						'method': 'POST',
+						'params': {'uploadType': 'multipart'},
+						'headers': { 'Content-Type': 'multipart/form-data; boundary="' + boundary + '"', 'Authorization': 'Bearer ' + auth_token, },
+						'body': multipartRequestBody 
+					}).execute(function(file) 
+					{ 
+						
+						
+						photoID = file.id;
+						gapi.client.drive.files.get(
+						{
+							'fileId': photoID,
+							fields: 'webContentLink'
+						}).then(function(response)
+						{
+							
+						parseResponse = JSON.parse(response.body);
+						webLink = parseResponse.webContentLink;
+						updatedSettings.profilePic = webLink;
+						AddPostToWall('mySettingsJSON.txt', updatedSettings);
+						
+						}), function(reason)
+						{
+							
+						};					
+				
+					}, function(error){
 
+					});
+				}), function(reason)
+				{
+						
+				}  
+			}
+			reader.onerror = function (evt) {
+				document.getElementById("filePhoto").innerHTML = "error reading file";
+			}
+		}
+		var $el = $('#filePhoto');
+		$el.wrap('<form>').closest('form').get(0).reset();
+		$el.unwrap();
+		uploadFileAfter = document.getElementById("filePhoto").files[0];
+
+	
 	$('#fname').hide(); //Initially form will be hidden.
 	$('#lname').hide();
 	$('#bname').hide();
@@ -273,6 +382,7 @@ function createPost(obj,i,templateCardPost)
 /*------------------------------------------------
 				Google API
 --------------------------------------------------*/ 
+
 function handleClientLoad() 
 	  {
         // Loads required libraries for functionality
@@ -308,10 +418,13 @@ function handleClientLoad()
 				//If POSN is not setup then setup
 				if( isPOSNSetup() == true)
 				{
-					//Put here whatever you want to test
-					//AddPostToWall();
-					getCurrentWall();
+					
+					getCurrentWall('myWallJSON.txt');
+	
+					getCurrentWall('mySettingsJSON.txt');
+				
 				}
+				
 			}
       }
 
@@ -340,18 +453,18 @@ function handleClientLoad()
 			 'q' : query
 		}).then(function(response) 
 		{
-			console.log(response.result);
 			if( response.result.files.length == 0 )
 			{
 				//If folder is not found (POSN not initialized),
 				//then initialize setup 
-				return "./setting.html"; // direct user to settings page 
 				setupPOSN();
+				
+				
 			}
 			console.log("POSN is setup");
         }, function(reason) 
 		{
-			console.log('Error: ' + reason.result.error.message);
+			
         });
 		return true;			
 	}
@@ -373,26 +486,16 @@ function handleClientLoad()
 		friend.friendsList = [];
 		jsonFriends = JSON.stringify(friend);
 		
-		/*
-		//Get Profile information for default settings
-		var userSettings = new Object();
-		var settingsName = 'mySettings.txt';
-		var profile = gapi.auth2.BasicProfile();
-		console.log(profile);
-		userSettings.firstName = profile.getGivenName();
-		userSettings.lastName = profile.getFamilyName();
-		userSettings.userEmail = profile.getEmail();
-		parseSettings = JSON.stringify(userSettings);
-		*/
+	
 		
 		var userSettings = new Object();
 		var settingsName = 'mySettingsJSON.txt';
-		userSettings.username = 'mattram6'
-		userSettings.firstName = 'Matthew'
-		userSettings.lastName = 'Cook'
-		userSettings.birthday = '06/08/1996'
-		userSettings.email = 'matthewcook@nevada.unr.edu'
-		userSettings.phone = '916-757-7074'
+		userSettings.username = ''
+		userSettings.firstName = ''
+		userSettings.lastName = ''
+		userSettings.birthday = ''
+		userSettings.email =''
+		userSettings.phone = ''
 		jsonSettings = JSON.stringify(userSettings);
 		
 		subFolderNames = ['POSN_Photos','POSN_Comments','POSN_Music','POSN_Videos','POSN_Other_Files']
@@ -408,7 +511,7 @@ function handleClientLoad()
 			resource : bodyMetadata
 		}).then(function(response) 
 		{
-			console.log(response.result);
+			
 			makeSubFolders(response.result.id, subFolderNames);
 			postJSON(wallJsonName, response.result.id, jsonUser);
 			postJSON(friendFileName, response.result.id, jsonFriends);
@@ -417,7 +520,7 @@ function handleClientLoad()
 			
         }, function(reason) 
 		{
-			console.log('Error: ' + reason.result.error.message);
+			
         });
 	}
 	 
@@ -860,7 +963,7 @@ function handleClientLoad()
 					{
 						parseString.textposts.push(user_posts);
 					}
-					if(jsonName == 'myFriendsJSON.txt')
+					else if(jsonName == 'myFriendsJSON.txt')
 					{
 						parseString.friendsList.push(user_posts);
 					}
@@ -908,12 +1011,12 @@ function handleClientLoad()
 	}
 
 	
-	function getCurrentWall()
+	function getCurrentWall(jsonName)
 	{
 		//Variables for finding JSON file
-		var jsonName = "name= " + "'myWallJSON.txt'";
+		var jsonQuery = `name= '${jsonName}'`;
 		var isTrashed = "trashed = false"
-		var queryList = jsonName + 'and' + isTrashed;
+		var queryList =  jsonQuery + 'and' + isTrashed;
 		var jsonID;
 		var obj;
 		//Find Wall JSON ID
@@ -934,8 +1037,19 @@ function handleClientLoad()
 			}).then(function(response)
 			{
 				console.log(response.body);
-					obj = JSON.parse(response.body);
-				repopulate(obj);
+				obj = JSON.parse(response.body);
+				
+				if( jsonName == 'myWallJSON.txt')
+				{
+					console.log("in");
+					repopulate(obj);
+					
+					
+				}
+				else
+				{
+					repopulateSettings(obj);
+				}
 
 			}, function(reason)
 			{
@@ -1025,7 +1139,7 @@ function handleClientLoad()
 						parseResponse = JSON.parse(response.body);
 						webLink = parseResponse.webContentLink;
 						current_post.photoLink = webLink;
-						AddPostToWall('myWallJSON.txt',current_post);
+						AddPostToWall('myWallJSON.txt', current_post);
 						
 						}), function(reason)
 						{
@@ -1063,21 +1177,21 @@ function handleClientLoad()
 		var isTrashed = "trashed = false"
 		//Function returns a list of files in google drive
         var listPromise = Promise.resolve(gapi.client.drive.files.list(
-			{    
-				 'orderBy': order,
-				 'q' : photoDirectory
-			}).then(function(response) 
-			{
-				console.log(response.result.files);
-				var filesList = response.result.files;
-				var webLinkList = [];
-				getWebLinks( filesList, webLinkList );
-				return webLinkList;
-			}, function(reason) 
-			{
-				console.log('Error: ' + reason.result.error.message);
-				apiBackoff(getPhotoLinks());
-			}));
+		{    
+			'orderBy': order,
+			'q' : photoDirectory
+		}).then(function(response) 
+		{
+			console.log(response.result.files);
+			var filesList = response.result.files;
+			var webLinkList = [];
+			getWebLinks( filesList, webLinkList );
+			return webLinkList;
+		}, function(reason) 
+		{
+			console.log('Error: ' + reason.result.error.message);
+			apiBackoff(getPhotoLinks());
+		}));
 			
 		listPromise.then(function(value)
 		{
@@ -1170,21 +1284,21 @@ function handleClientLoad()
 	}
 	  	
 		
-		//Old, unfinished, or unused functions
-		//listed below:
+	//Old, unfinished, or unused functions
+	//listed below:
 		
-		//Unused
-		function sleep(ms) 
-		{
-			return new Promise(resolve => setTimeout(resolve, ms));
-		}
+	//Unused
+	function sleep(ms) 
+	{
+		return new Promise(resolve => setTimeout(resolve, ms));
+	}
 
-		async function demo() 
-		{
-			console.log('Taking a break...');
-			await sleep(1000);
-			console.log('Two second later');
-		}
+	async function demo() 
+	{
+		console.log('Taking a break...');
+		await sleep(1000);
+		console.log('Two second later');
+	}
 
 	//Works but cannot return
 	function getFileId( fileName )
@@ -1248,7 +1362,6 @@ function signOut() {
  
     });
   }
-
 
 
 
