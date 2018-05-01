@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <!-- saved from url=(0051)https://socialyte.codeplus.it/personal-profile.html -->
 <html>
@@ -82,15 +83,13 @@
 		<!--Left Sidebar with info Profile -->
 		<div id = 'sidebar' class="sidebar-nav">
 		
-			<a href=# title="Profile">
-			   <img src="./Personal Profile Template_files/user.jpg" alt="User name" class="img-circle img-user">
-			</a>
-			<h2 class="text-center hidden-xs"><span class= "UserName" >Wholmes</span></h2>
-			  
+
 			
-				<i><center>Short Profile Info.</center></i>
+			<center><img id="profilePhoto" class="profile-img"  style="width:128px;height:128px;" /></center>
+			<center><h2><p><span class= "user" ></span></p></h2></center>
+			<i><center>Short Profile Info.</center></i>
 		
-			</p>
+		
 		
 			
 
@@ -123,10 +122,10 @@
 										<label for="file-input">
 											<i class="fa fa-upload" style="font-size:25px;color:#ad2ab2"></i>
 										</label>
-										
-										<input id="file-input" type="file" name = "file" value = "Upload Image" />
-										 <!-- <div class="upload-image-preview"></div>-->
-										 
+						
+											<input id="file-input" type="file" name = "file" value = "Upload Image" />
+											<!-- <div class="upload-image-preview"></div>-->
+					
 	
 									</div>
 										
@@ -143,12 +142,12 @@
 								<div class="row">
 									<div class="col-xs-3 col-sm-2">
 										<a href=# title="Profile">
-											<img id = "my_image" src="./Personal Profile Template_files/user.jpg" alt="User name" class="img-circle img-user">
+											<img id="userPhoto" class="profile-img"  style="width:128px;height:128px;" />
 										</a>
 									</div>
 									
 									<div class="col-xs-9 col-sm-10 info-user">
-										<!--<h3><a href="https://socialyte.codeplus.it/personal-profile.html" title="Profile">My User</a></h3>-->
+										
 										<h3><p><span class= "name" ></span></p></h3>
 										<p><i><span class ="time" style="float:right;"> </span></i></p>
 									</div>
@@ -254,6 +253,7 @@
 		<script type="text/javascript" src="jquery-ui.js"></script> <!-- Helps with animations -->
 		<script type="text/javascript" src="jquery.form.js"></script> <!-- Helps with animations -->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
 		<script async defer src="https://apis.google.com/js/api.js"
 		onload="this.onload=handleClientLoad()"
 		onreadystatechange="if (this.readyState === 'complete') this.onload()">
