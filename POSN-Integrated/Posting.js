@@ -29,8 +29,7 @@ $(document).ready(function(){
 	    savedPosts.appendTo(".innerdiv").show();
 
 		$('#post').val('');
-		
-
+	});
 	
 });
 function updateUsername_photo(user,pic)
@@ -166,7 +165,7 @@ function setPost(templateCardPost,img){
 	else
 	{
 		templateCardPost.find(".upload-image-preview").html('');  
-		AddDataToJSON('myWallJSON.txt',current_post);
+		AddPostToWall('myWallJSON.txt',current_post);
 		
 	}	
 	
@@ -226,7 +225,7 @@ function createPost(obj,i,templateCardPost)
 	updatedSettings.email = update_email.value;
 	updatedSettings.phone = update_phone.value;
 	
-	AddDataToJSON('mySettingsJSON.txt', updatedSettings);
+	AddPostToWall('mySettingsJSON.txt', updatedSettings);
 	
 	if($('#first')[0].value != '')
 	{
@@ -344,7 +343,7 @@ function createPost(obj,i,templateCardPost)
 						parseResponse = JSON.parse(response.body);
 						webLink = parseResponse.webContentLink;
 						updatedSettings.profilePic = webLink;
-						AddDataToJSON('mySettingsJSON.txt', updatedSettings);
+						AddPostToWall('mySettingsJSON.txt', updatedSettings);
 						
 						}), function(reason)
 						{
