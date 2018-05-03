@@ -389,14 +389,8 @@ function createPost(obj,i,templateCardPost)
 				Google API
 --------------------------------------------------*/ 
 
-
-/*------------------------------------------------
-				Google API
---------------------------------------------------*/ 
-
-
-	  function handleClientLoad() 
-	  {
+      function handleClientLoad() 
+      {
         // Loads required libraries for functionality
         gapi.load('client:auth2', initClient);
       }
@@ -436,6 +430,7 @@ function createPost(obj,i,templateCardPost)
 					//getAppJSON('mySettingsJSON.txt');
 					//addFriend('Tony Malone', 'slayer441139@gmail.com');
 					//removeFriend('Tony Malone');
+					getSharedWall('TonyMalone');
 				
 				}
 				
@@ -647,6 +642,7 @@ function createPost(obj,i,templateCardPost)
 					}).then(function(response)
 					{
 						newFriend.photoID = response.result.id;
+						console.log('Swag');
 						AddDataToJSON('myFriendsJSON.txt', newFriend);
 					}, function(reason)
 					{
@@ -656,11 +652,10 @@ function createPost(obj,i,templateCardPost)
 				{
 					console.log('Error: ' + reason.result.error.message);
 				});
-					AddDataToJSON('myFriendsJSON.txt', newFriend);
-				}, function(reason)
-				{
-					console.log('Error: ' + reason.result.error.message);
-				});
+			}, function(reason)
+			{
+				console.log('Error: ' + reason.result.error.message);
+			});
 		}, function(reason) 
 		{
 			console.log('Error: ' + reason.result.error.message);
@@ -670,16 +665,16 @@ function createPost(obj,i,templateCardPost)
 	function getSharedWall(friendName)
 	{
 		var fileName = "name= 'myWallJSON.txt'";
-		var fullText = `fullText contains '${friendName}'`
 		var isTrashed = "trashed = false"
 		var sharedParam = "sharedWithMe = true";
-		var query = fileName + 'and' + isTrashed + 'and' + sharedParam + 'and' + fullText;
+		var query = fileName + 'and' + isTrashed + 'and' + sharedParam;
 		console.log(query);
 		gapi.client.drive.files.list(
 		{    
 			 'q' : query
 		}).then(function(response) 
 		{
+			console.log(response);
 			fileID = response.result.files[0].id
 			gapi.client.drive.files.get(
 			{    
@@ -976,7 +971,7 @@ function createPost(obj,i,templateCardPost)
 		var sharedParam = "'me' in owners";
 		var queryList = queryName + 'and' + isTrashed + 'and' + sharedParam;
 		var jsonID;
-		
+		console.log(queryList);
 		//Step 1: Find POSN_Directory ID
 		gapi.client.drive.files.list(
 		{    
@@ -994,6 +989,7 @@ function createPost(obj,i,templateCardPost)
 			}).then(function(response) 
 			{				
 				//ID of JSON
+				console.log(response);
 				jsonID = response.result.files[0].id;
 				
 				//Get contents of JSON
