@@ -35,23 +35,34 @@ $(document).ready(function(){
 			imageSet(img);
 		}
 
-
+		$('#post').val('');
 			
 	});
+	
+	
+		
+	$("#friendbtn").click(function(){
+		
+		
+		addFriend("Matt","matthewcook@nevada.unr.edu");
+		
+	});
+	
+	
 	
 });
 
 function imageSet(img)
 {
 		
-		saveImage = img;
+
 		savedPosts = setPost($("#card-post"),img);		
 	    savedPosts.appendTo(".innerdiv").show();
 }	
 
 function updateUsername_photo(user,pic)
 {
-	console.log("hi");
+
 	$('#userPhoto').attr('src',pic);
 	$('#sidebar').find(".user").html(user);
 	$('#profilePhoto').attr('src', pic);
@@ -643,6 +654,7 @@ function createPost(obj,i,templateCardPost)
 						newFriend.photoID = response.result.id;
 						console.log('Swag');
 						AddDataToJSON('myFriendsJSON.txt', newFriend);
+						
 					}, function(reason)
 					{
 						console.log('Error: ' + reason.result.error.message);
