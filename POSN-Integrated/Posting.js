@@ -35,7 +35,7 @@ $(document).ready(function(){
 			imageSet(img);
 		}
 
-		$('#post').val('');
+		
 			
 	});
 	
@@ -44,7 +44,7 @@ $(document).ready(function(){
 	$("#friendbtn").click(function(){
 		
 		
-		addFriend("Matt","matthewcook@nevada.unr.edu");
+		//addFriend("Matt","matthewcook@nevada.unr.edu");
 		
 	});
 	
