@@ -1,6 +1,7 @@
 
 
 
+
 <!DOCTYPE html>
 <!-- saved from url=(0051)https://socialyte.codeplus.it/personal-profile.html -->
 <html>
@@ -12,7 +13,7 @@
 		<link rel="stylesheet" href="./Personal Profile Template_files/bootstrap.min.css" type="text/css">
 		<link rel="stylesheet" href="./Posting.css" type="text/css">
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-	
+		
 
 	
 	</head>
@@ -87,11 +88,25 @@
 			
 			<center><img id="profilePhoto" class="profile-img"  style="width:128px;height:128px;" /></center>
 			<center><h2><p><span class= "user" ></span></p></h2></center>
-			<i><center>Short Profile Info.</center></i>
 		
-		
-		
+				
+				
+				
+				
+				
+				<div class="friends">
+				
+				
+					<i><b><center>Friends</center></b></i>
+					<img id="friendPhoto" class="img-fluid"  style="width:75px;height: 75px;" />
+					
+				
+				</div>
 			
+
+				
+				
+				
 
 		
 		</div>
@@ -124,10 +139,24 @@
 										</label>
 						
 											<input id="file-input" type="file" name = "file" value = "Upload Image" />
+										
 											<!-- <div class="upload-image-preview"></div>-->
 					
 	
 									</div>
+									<div class="image-upload">
+										<label for="file-input">
+											<i class="fa fa-video-camera" style="font-size:25px;color:#ad2ab2"></i>
+										</label>
+						
+												<input type="file" name="file[]" class="file_multi_video" accept="video/*">
+								
+									</div>
+									
+								
+									
+								
+
 										
 														
 									<button id = 'postbtn' type="submit" class = "button1">Post</button>	
@@ -142,13 +171,14 @@
 								<div class="row">
 									<div class="col-xs-3 col-sm-2">
 										<a href=# title="Profile">
-											<img id="userPhoto" class="profile-img"  style="width:128px;height:128px;" />
+										
+											<img id="userPhoto" class="img-fluid"  style="width:75px;height: 75px;" />
 										</a>
 									</div>
 									
 									<div class="col-xs-9 col-sm-10 info-user">
 										
-										<h3><p><span class= "name" ></span></p></h3>
+										<h3><p><span class= "userWall" ></span></p></h3>
 										<p><i><span class ="time" style="float:right;"> </span></i></p>
 									</div>
 								</div>
@@ -156,6 +186,8 @@
 									<div class="col-sm-8 col-sm-offset-2 data-post">
 										<p><span class= "display" ></span></p>
 										<p><div class="upload-image-preview" ></div></p>
+										
+							
 										
 											   
 										<div class="reaction">
