@@ -136,7 +136,7 @@ to a txt file.
 
 function repopulateSettings(object)
 {
-	
+	updateUsername_photo(object.username,object. profilePic);
 	$("#add_listing_info").find(".firstname").html(object.firstName);
 	$("#add_listing_info").find(".lastname").html(object.lastName);
 	$("#add_listing_info").find(".birthday").html(object.birthday);
@@ -145,7 +145,7 @@ function repopulateSettings(object)
 	$("#add_listing_info").find(".username").html(object.username);
 	$('#previewHolder').attr('src', object. profilePic);
 
-	updateUsername_photo(object.username,object. profilePic);
+	
 
 
 
