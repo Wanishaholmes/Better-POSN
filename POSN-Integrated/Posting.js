@@ -172,7 +172,7 @@ function setPost(templateCardPost,img){
 	else
 	{
 		templateCardPost.find(".upload-image-preview").html('');  
-		AddPostToWall('myWallJSON.txt',current_post);
+		AddDataToJSON('myWallJSON.txt',current_post);
 		
 	}	
 	
@@ -232,7 +232,7 @@ function createPost(obj,i,templateCardPost)
 	updatedSettings.email = update_email.value;
 	updatedSettings.phone = update_phone.value;
 	
-	AddPostToWall('mySettingsJSON.txt', updatedSettings);
+	AddDataToJSON('mySettingsJSON.txt', updatedSettings);
 	
 	if($('#first')[0].value != '')
 	{
@@ -350,7 +350,7 @@ function createPost(obj,i,templateCardPost)
 						parseResponse = JSON.parse(response.body);
 						webLink = parseResponse.webContentLink;
 						updatedSettings.profilePic = webLink;
-						AddPostToWall('mySettingsJSON.txt', updatedSettings);
+						AddDataToJSON('mySettingsJSON.txt', updatedSettings);
 						
 						}), function(reason)
 						{
@@ -426,11 +426,10 @@ function createPost(obj,i,templateCardPost)
 				{
 					
 					//addFriend('TonyMalone', 'slayer441139@gmail.com');
-					//getAppJSON('myWallJSON.txt');
-					//getAppJSON('mySettingsJSON.txt');
-					//addFriend('Tony Malone', 'slayer441139@gmail.com');
+					getAppJSON('myWallJSON.txt');
+					getAppJSON('mySettingsJSON.txt');
 					//removeFriend('Tony Malone');
-					getSharedWall('TonyMalone');
+					//getSharedWall('TonyMalone');
 				
 				}
 				
@@ -668,7 +667,6 @@ function createPost(obj,i,templateCardPost)
 		var isTrashed = "trashed = false"
 		var sharedParam = "sharedWithMe = true";
 		var query = fileName + 'and' + isTrashed + 'and' + sharedParam;
-		console.log(query);
 		gapi.client.drive.files.list(
 		{    
 			 'q' : query
@@ -733,34 +731,61 @@ function createPost(obj,i,templateCardPost)
 		});
 	}
 
+	
 	function removePermissions( permissionId )
 	{
+		//Variables for finding Wall JSON
 		var fileName = "name= 'myWallJSON.txt'";
 		var isTrashed = "trashed = false"
 		var query = fileName + 'and' + isTrashed;
+		var jsonID;
+		
+		//Variables for finding Photos folder
+		var photosName = "name= " + "'POSN_Photos'";
+		var queryList = photosName + 'and' + isTrashed;
+		var photosID;
 
+		console.log(query);
+		console.log(queryList);
+		
 		gapi.client.drive.files.list(
 		{    
 			 'q' : query
 		}).then(function(response) 
 		{
-			fileID = response.result.files[0].id
-			gapi.client.drive.permissions.list(
+			console.log(response);
+			jsonID = response.result.files[0].id;
+			gapi.client.drive.files.list(
 			{    
-				 'fileId' : fileID
+				 'q' : queryList
 			}).then(function(response) 
-			{
+			{	
+				console.log(response);
+				photosID = response.result.files[0].id;
 				gapi.client.drive.permissions.delete(
 				{    
-					'fileId' : fileID,
-					'permissionId' : permissionId
+						'fileId' : jsonID,
+						'permissionId' : permissionId
 				}).then(function(response) 
 				{
-					
+						
 				}, function(reason) 
 				{
 					console.log('Error: ' + reason.result.error.message);
-				});			
+				});	
+				
+				gapi.client.drive.permissions.delete(
+				{    
+						'fileId' : photosID,
+						'permissionId' : permissionId
+				}).then(function(response) 
+				{
+						
+				}, function(reason) 
+				{
+					console.log('Error: ' + reason.result.error.message);
+				});	
+
 			}, function(reason) 
 			{
 				console.log('Error: ' + reason.result.error.message);
@@ -815,7 +840,7 @@ function createPost(obj,i,templateCardPost)
 						if(parseFriends.friendsList[i].name == friendName )
 						{
 							console.log('Friend found');
-							removePermissions( parseFriends.friendsList[i].permissionID );
+							removePermissions( parseFriends.friendsList[i].wallID );
 							parseFriends.friendsList.splice(i);
 							updateJSON = JSON.stringify(parseFriends);
 							postJSON('myFriendsJSON.txt', mainDir, updateJSON);
@@ -848,6 +873,7 @@ function createPost(obj,i,templateCardPost)
 			console.log('Error: ' + reason.result.error.message);
         });	
 	}
+
 	
 	//Can upload a text file to Google Drive root
 	function uploadFileFromButton() 
