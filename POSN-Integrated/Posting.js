@@ -66,6 +66,7 @@ function updateUsername_photo(user,pic)
 	$('#userPhoto').attr('src',pic);
 	$('#sidebar').find(".user").html(user);
 	$('#profilePhoto').attr('src', pic);
+	$('#innerdiv').find(".userWall").html(user);
 
 
 }
