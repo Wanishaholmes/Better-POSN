@@ -390,7 +390,12 @@ function createPost(obj,i,templateCardPost)
 --------------------------------------------------*/ 
 
 
-function handleClientLoad() 
+/*------------------------------------------------
+				Google API
+--------------------------------------------------*/ 
+
+
+	  function handleClientLoad() 
 	  {
         // Loads required libraries for functionality
         gapi.load('client:auth2', initClient);
@@ -427,8 +432,10 @@ function handleClientLoad()
 				{
 					
 					//addFriend('TonyMalone', 'slayer441139@gmail.com');
-					getAppJSON('myWallJSON.txt');
-					getAppJSON('mySettingsJSON.txt');
+					//getAppJSON('myWallJSON.txt');
+					//getAppJSON('mySettingsJSON.txt');
+					//addFriend('Tony Malone', 'slayer441139@gmail.com');
+					//removeFriend('Tony Malone');
 				
 				}
 				
@@ -524,7 +531,6 @@ function handleClientLoad()
 			postJSON(wallJsonName, response.result.id, jsonUser);
 			postJSON(friendFileName, response.result.id, jsonFriends);
 			postJSON(settingsName, response.result.id, jsonSettings);
-			//postJSON(settingsName, response.result.id, parseSettings);
 			
         }, function(reason) 
 		{
