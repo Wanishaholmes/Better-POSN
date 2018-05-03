@@ -1,7 +1,5 @@
 
 
-
-
 /*---------------------------------------------------------------
 [Main Color]
 -----------------------------------------------------------------*/
@@ -56,9 +54,19 @@ video, img {
 .upload-image-preview {
   width: 50%;
   height: 50%;
-  
+
 }
 
+.img-fluid{
+	
+			border-radius: .25rem;
+	
+}
+.qty1, .qty2 {
+    border: none;
+    width:20px;
+    background: transparent;
+}
 .emoji  { width:16px;}
 
 .btn:focus,.btn:active, .btn:active:focus  { outline:none; }
@@ -90,7 +98,6 @@ border-radius: .55rem;
 .popular-img {
    margin-top:10px;
 }
-
 
 /*----------------------------------------------------------------
 2. Header
@@ -219,7 +226,22 @@ header .badge {
     border-top: 1px solid #dadada;
     padding-top: 5px;
 }
+video, input {
+    display: block;
+}
 
+input {
+    width: 100%;       
+}
+
+.info {
+    background-color: aqua;            
+}
+
+.error {
+    background-color: red;
+    color: white;
+}
 .comments ul {
     list-style: none;
     padding: 0px;
@@ -588,7 +610,10 @@ button.btn-primary {
     font-family: 'Montserrat', sans-serif;
     letter-spacing: 1px;
 }
-
+.profile-img{
+	border-radius: 50%;
+	
+} 
 
 
 
@@ -694,9 +719,7 @@ button.btn-primary {
 
   header .dropdown-menu { top:36px; }
 
-  .sidebar-nav {  width:125px;
-                  height: auto;
-                  padding: 10px;}
+  .sidebar-nav {  display:none;}
 
   .img-user   { width:80%;
                 margin-left:10%;  }
@@ -739,6 +762,7 @@ button.btn-primary {
 
 }
 
+
 @media screen and (max-width:479px)  {
                                           header { padding-left: 100px;
                                                    min-height:100px; }
@@ -751,7 +775,7 @@ button.btn-primary {
                                           .card-post  .img-user  {width:90%;
                                                                   margin-left:5%;}
 
-                                          .sidebar-nav { width: 100px;}
+                                          .sidebar-nav { display:none;}
 										  .download{width: 80px;}
 
                                           .form-box  {width: 310px;
