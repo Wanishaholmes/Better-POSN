@@ -1,4 +1,6 @@
-
+/*-----------------------------------------
+Posting Page styles 
+-----------------------------------*/
 
 /*---------------------------------------------------------------
 [Main Color]
@@ -46,64 +48,6 @@ h3 { font-size: 15px;
      margin-top:0;
      margin-bottom:5px;}
 
-video, img {
-    width: 100%;
-    height: auto;
-}
-
-.upload-image-preview {
-  width: 50%;
-  height: 50%;
-
-}
-
-.img-fluid{
-	
-			
-	
-}
-.qty1, .qty2 {
-    border: none;
-    width:20px;
-    background: transparent;
-}
-.emoji  { width:16px;}
-
-.btn:focus,.btn:active, .btn:active:focus  { outline:none; }
-
-.content-posts {
-    margin-left: 240px;
-    margin-top: 65px;
-}
-
-.img-user {
-    width: 90%;
-    margin-left: 5%;
-}
-.card-post{
-	
-border-radius: .55rem;	
-	
-}
-.card-post .img-user  { max-width: 110px;
-                        min-width: 60px;}
-
-.card-post .chat-row .img-user { min-width:inherit; }
-
-.img-user-mini {
-    width: 30px;
-    height: 30px;
-}
-
-.popular-img {
-   margin-top:10px;
-}
-.friends{
-	
-		
-		padding-bottom: 7px;
-	
-}
 
 /*----------------------------------------------------------------
 2. Header
@@ -349,6 +293,54 @@ input {
     cursor: pointer;
 }
 
+.upload-image-preview {
+  width: 50%;
+  height: 50%;
+
+}
+
+.img-fluid{
+	
+			border-radius: .25rem;
+	
+}
+.qty1, .qty2 {
+    border: none;
+    width:20px;
+    background: transparent;
+}
+.emoji  { width:16px;}
+
+.btn:focus,.btn:active, .btn:active:focus  { outline:none; }
+
+.content-posts {
+    margin-left: 240px;
+    margin-top: 65px;
+}
+
+.img-user {
+    width: 90%;
+    margin-left: 5%;
+}
+.card-post{
+	
+border-radius: .55rem;	
+	
+}
+.card-post .img-user  { max-width: 110px;
+                        min-width: 60px;}
+
+.card-post .chat-row .img-user { min-width:inherit; }
+
+.img-user-mini {
+    width: 30px;
+    height: 30px;
+}
+
+.popular-img {
+   margin-top:10px;
+}
+
 /*----------------------------------------------------------------
 4. User Profile
 -----------------------------------------------------------------*/
@@ -443,11 +435,8 @@ textarea.post-textarea {
     border-bottom: 1px solid #eaeaea;
 }
 
-
-
-
 /*----------------------------------------------------------------
-6. Settings
+5. Settings
 -----------------------------------------------------------------*/
 
 .setting-container{
@@ -561,7 +550,7 @@ button.btn-primary {
 
 
 /*----------------------------------------------------------------
-7. Scrollbar
+6. Scrollbar
 -----------------------------------------------------------------*/
 
  ::-webkit-scrollbar {
@@ -580,7 +569,7 @@ button.btn-primary {
 
 
 /*----------------------------------------------------------------
-8. Small Devices
+7. Small Devices
 -----------------------------------------------------------------*/
 
 
