@@ -1,4 +1,9 @@
 
+/*---------------------------------
+	Login Page styles 
+-----------------------------------*/
+
+
 li a:hover {
     background-color: #AD2AB2;
 }
@@ -13,9 +18,6 @@ li a:hover {
 	line-height: 70%;  
 	text-align: center; 
 }
-
-
-
 
 body {
     background-image: url(1.jpg); 
@@ -47,17 +49,6 @@ body b{
 	padding: 45px; 
 	text-align: center; 
 }
-/*.form input[type = name]{
-    width: 55%;
-    padding: 5px 5px;
-    margin: 8px 0;
-    box-sizing: context-box;
-    border: none;
-    background-color: #FFFFFF;
-	border-radius: 25px;
-    color: purple;
-}*/ 
-
 
 li {
     float: left;
@@ -86,8 +77,6 @@ p{
     font-family: 'Mako';font-size: 14px;
 	color: white; 
 }
-
-
  .register{
     position: absolute; 
 	top: calc (50%-75px); 
