@@ -1,8 +1,4 @@
-/*----------------------------------------
-	Posting Java script file 
-	includes Google API functions
-	and Login page functionality 
-------------------------------------------*/
+
 $(document).ready(function(){
 	var savedPosts;
 	var img;
@@ -13,21 +9,18 @@ $(document).ready(function(){
 	$('#loginGoogle').click(function(){
 	    handleClientLoad(); 	  
      });
-	 
-	 //hides div so it does not appear on page load 
+
 	$("#card-post").hide(); 
 	
-	//set the setting
 	settingedit();
 
 
 	
 	$("#postbtn").click(function(){
 		
-	//handles reading the image if one exists
-	//otherwise img will be empty 
+
 			
-		if ($("#file-input")[0].files &&$("#file-input")[0].files[0]) {
+	if ($("#file-input")[0].files &&$("#file-input")[0].files[0]) {
 			var reader = new FileReader();
 			reader.onload = function (e) {
 				img = $('<img>').attr('src', e.target.result);
@@ -42,64 +35,35 @@ $(document).ready(function(){
 			imageSet(img);
 		}
 
+
+			
 	});
 	
 });
-/*------------------------------------
-	Login Page Functions 
-----------------------------------------*/
-function onSignIn(googleUser){
-// Useful data for your client-side scripts:
-	var profile = googleUser.getBasicProfile();
-}
 
-function signOut() {
-    var auth2 = gapi.auth2.getAuthInstance();
-    auth2.signOut().then(function () {
-    });
-  }
-/*-------------------------------------------------------
-					Wall functionality Functions 
-
------------------------------------------------------------*/
-  
-/*-----------------------------------------------------
-				        imageSet
-           function handles getting the image 
-		   if one exists and if one doesn't it will ---
-		   
-		   be empty. 
-------------------------------------------------------*/
-  
 function imageSet(img)
 {
 		
-
+		saveImage = img;
 		savedPosts = setPost($("#card-post"),img);		
 	    savedPosts.appendTo(".innerdiv").show();
 }	
-/*-----------------------------------------------------
-				       updateUsername_photo
-           function handles setting the Wall 
-		   based off user settings
-------------------------------------------------------*/
+
 function updateUsername_photo(user,pic)
 {
-
+	console.log("hi");
 	$('#userPhoto').attr('src',pic);
 	$('#sidebar').find(".user").html(user);
 	$('#profilePhoto').attr('src', pic);
-	$('#innerdiv').find(".userWall").html(user);
+
 
 }
-/*-----------------------------------------------------
-				         settingedit
-           function handles changes in setting
-		   and sending them to Google drive. 
-------------------------------------------------------*/
+
 function settingedit()
 {
+	
 
+	
 	$('#fname').hide(); //Initially form will be hidden.
 	$('#lname').hide();
 	$('#bname').hide();
@@ -140,10 +104,9 @@ function settingedit()
 
 }
 /*-----------------------------------------------------
-				repopulate 
-			functions handles repopulating
-			posts holder function for 
-			appending for now
+				download
+function handles downloading json file information 
+to a txt file. 
 ------------------------------------------------------*/
 
  function repopulate(object) {
@@ -159,11 +122,7 @@ function settingedit()
 	}
 
 }
-/*-----------------------------------------------------
-				         repopulateSettings
-           function handles repopulating
-		   settings  that are user defined 
-------------------------------------------------------*/
+
 function repopulateSettings(object)
 {
 	
@@ -174,7 +133,7 @@ function repopulateSettings(object)
 	$("#add_listing_info").find(".phone").html(object.phone);
 	$("#add_listing_info").find(".username").html(object.username);
 	$('#previewHolder').attr('src', object. profilePic);
-	//function to send in the correct changes to wall 
+
 	updateUsername_photo(object.username,object. profilePic);
 
 
@@ -184,10 +143,9 @@ function repopulateSettings(object)
 
 
 /*-----------------------------------------------------
-				           setPost
-           function handles creating a 
-           new post as needed when user
-              clicks on post button
+				setPost
+function handles creating a new post as needed when user
+clicks on post button
 ------------------------------------------------------*/
 
 function setPost(templateCardPost,img){
@@ -204,7 +162,7 @@ function setPost(templateCardPost,img){
 	current_post.content = the_post.value ; 
 	
 	uploadFile = document.getElementById("file-input").files[0];
-
+	console.log(uploadFile);
 	if(uploadFile)
 	{
 		templateCardPost.find(".upload-image-preview").html(img); 
@@ -221,19 +179,17 @@ function setPost(templateCardPost,img){
 	return templateCardPost.clone();
 }
 
-
 /*-----------------------------------------------------
-							createPost
-		function handles repopulating 
-					previous posts.
--------------------------------------------------------------*/
+				createPost
+function handles repopulating previous posts.
+------------------------------------------------------*/
 
 function createPost(obj,i,templateCardPost)
 {
 	var old_post = new Object();	
 	
 	img = $('<img>').attr('src', obj.textposts[i].photoLink);
-		//sets values for wall 
+	
 	templateCardPost.find(".name").html(obj.name);				
 	templateCardPost.find(".display").html(obj.textposts[i].content);
 	templateCardPost.find(".time").html(obj.textposts[i].datetime);
@@ -268,7 +224,7 @@ function createPost(obj,i,templateCardPost)
 	var img;
 	
 	var updatedSettings = new Object();
-	//sets values to API variables 
+	
 	updatedSettings.username = update_username.value;
 	updatedSettings.firstName = update_firstname.value;
 	updatedSettings.lastName = update_lastname.value;
@@ -277,7 +233,7 @@ function createPost(obj,i,templateCardPost)
 	updatedSettings.phone = update_phone.value;
 	
 	AddDataToJSON('mySettingsJSON.txt', updatedSettings);
-		//handles changes to  settings page
+	
 	if($('#first')[0].value != '')
 	{
 		
@@ -430,9 +386,7 @@ function createPost(obj,i,templateCardPost)
 	
 }
 /*------------------------------------------------
-				Google API Functions 
-		This is all functions needed for 
-		      API to work correctly. 
+				Google API
 --------------------------------------------------*/ 
 
       function handleClientLoad() 
@@ -1393,3 +1347,81 @@ function createPost(obj,i,templateCardPost)
 	}
 	  	
 		
+	//Old, unfinished, or unused functions
+	//listed below:
+		
+	//Unused
+	function sleep(ms) 
+	{
+		return new Promise(resolve => setTimeout(resolve, ms));
+	}
+
+	async function demo() 
+	{
+		console.log('Taking a break...');
+		await sleep(1000);
+		console.log('Two second later');
+	}
+
+	//Works but cannot return
+	function getFileId( fileName )
+	{
+		//Pass like "'Name'" to function
+		var fileName = "name= " + fileName;
+		console.log(fileName);
+		var isTrashed = "trashed = false"
+		var query = fileName + 'and' + isTrashed;
+		var fileID;
+		gapi.client.drive.files.list(
+		{    
+			 'q' : query
+		}).then(function(response) 
+		{
+			console.log(response.result);
+			fileID = response.result.files[0].id;
+			console.log(fileID)
+		}, function(reason) 
+		{
+			console.log('Error: ' + reason.result.error.message);
+		});
+	}
+	  
+	  //Old Version of function before batching was implemented
+	  function getWebLinksOld( filesList, webLinkList, i )
+	  {
+			//Gets web content links for all the photos in the folder
+			while( i < filesList.length )
+			{
+				currentID = filesList[i].id;
+				gapi.client.drive.files.get(
+				{
+					'fileId': currentID,
+					fields: 'webContentLink'
+				}).then( function(response) 
+				{
+					webLink = JSON.parse(response.body);
+					webLinkList.push(webLink.webContentLink);
+				}, function(reason)
+				{
+					console.log('Error: ' + reason.result.error.message);
+				});
+				i++;
+			}
+			console.log(webLinkList)
+	  }
+	  
+	
+	
+function onSignIn(googleUser){
+// Useful data for your client-side scripts:
+	var profile = googleUser.getBasicProfile();
+	//console.log("ID: " + profile.getId()); // Don't send this directly to your server!
+	
+}
+
+function signOut() {
+    var auth2 = gapi.auth2.getAuthInstance();
+    auth2.signOut().then(function () {
+ 
+    });
+  }
