@@ -15,8 +15,9 @@
 		<link href='https://fonts.googleapis.com/css?family=Mako' rel='stylesheet'>
 		<link href='https://fonts.googleapis.com/css?family=Advent Pro' rel='stylesheet'>
 		<meta name="google-signin-scope" content="profile email">
-		<meta name="google-signin-client_id" content="1048767164744-cqi2l396ecujb8jegk3831tp48ecgec1.apps.googleusercontent.com">
+		<meta name="google-signin-client_id" content="834692356537-5fn43u118ogta150l995623a7auu52fg.apps.googleusercontent.com">
 		<link rel="stylesheet" href="./login.css">
+
 
 	</head>	 
 		
@@ -25,8 +26,9 @@
 
 		<ul>
 			<li><a href = "http://personalonlinesocialnetwork.com "class="active" href="#posn" target="_blank">About POSN</a></li>
-			<li><a href = "./login" class="active" href="#home">Home</a></li>
-			<li><a href="#" onclick="signOut();">Sign out</a></li>
+			<li><a href = "./login.html" class="active" href="#home">Home</a></li>
+			 <li><a button id="signout-button" onclick="handleSignOutClick()">Sign Out</button></a></li>
+			<!---<a href="#" onclick="signOut();">Sign out</a></li> -->
 
 		</ul>
 
@@ -41,26 +43,39 @@
 	
 		<div class = "login">
 			<div class= "boxed">
-		
-				<center><div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark" ></div>
-		
-				<a href="./Posting.html"><input type="button" value="Enter POSN" /></a></center>
-			</div>
-		</div>	
+				<center>
+				
+					<!-- <button id="signin-button" onclick="handleSignInClick()">Sign In</button>  -->
+					<input type="button" value="Sign In" id="signin-button" onclick="handleSignInClick()" />
+					<div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark" ></div>
+					<a href="./Posting.html"><input type="button" value="Enter POSN" /></a>
+				</center>
+			</div> 
+		</div> 
+
+
 
 
 
 		<!-- scripts ---> 
-		<script src="https://apis.google.com/js/platform.js?onload=onLoadCallback" async defer></script>
+		<!--<script src="https://apis.google.com/js/platform.js?onload=onLoadCallback" async defer></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script type="text/javascript" src="jquery-3.3.1.min.js"></script> This is like the iostream of javascript if I had to equate it 
+		<script type="text/javascript" src="jquery-ui.js"></script>  Helps with animations
+		<script type="text/javascript" src="jquery.form.js"></script> Helps with animations
+		<script src="https://apis.google.com/js/platform.js" async defer></script>
+		<script type = "text/javascript" src="./Posting.js"></script> -->
+			
+		
+		<!-- scripts ---> 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<script type="text/javascript" src="jquery-3.3.1.min.js"></script> <!-- This is like the iostream of javascript if I had to equate it -->
 		<script type="text/javascript" src="jquery-ui.js"></script> <!-- Helps with animations -->
 		<script type="text/javascript" src="jquery.form.js"></script> <!-- Helps with animations -->
-		<script src="Posting.js"></script>
-		<script src="https://apis.google.com/js/platform.js" async defer></script>
+		<script type = "text/javascript" src="./Posting.js"></script>
+		<script async defer src="https://apis.google.com/js/api.js"onload="this.onload=handleClientLoad()"onreadystatechange="if (this.readyState === 'complete') this.onload()">
+    </script>
 
 	</body> 
 			
 </html>
-
-

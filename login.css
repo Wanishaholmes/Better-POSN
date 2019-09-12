@@ -5,11 +5,11 @@ li a:hover {
 	
 .boxed{
 	border-radius: 28px;  
-	font-size: 35px; 
+	font-size: 15px; 
 	background: #9932CC; 
 	padding: 20px 60px 15px 60px; 
 	margin: auto; 
-	width: 300px; 
+	width: 400px; 
 	line-height: 70%;  
 	text-align: center; 
 }
@@ -62,7 +62,6 @@ body b{
 li {
     float: left;
 	font-family: 'Advent Pro';font-size: 14px;
-
 }
 
 li a {
@@ -140,6 +139,8 @@ p{
 	border-radius: 25px;
     color: purple;
 }
+
+/* ENTER POSN BUTTON CSS*/
 .login input[type=button] {
     width: 35%;
     padding: 5px 5px;
@@ -149,6 +150,8 @@ p{
     background-color: #FFFFFF;
 	border-radius: 25px;
     color: purple;
+	font-family: 'Mako'; 
+	font-size: 12px; 
 	
 }
 .login input[type=button]:hover {
